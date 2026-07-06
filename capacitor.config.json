@@ -1,0 +1,8 @@
+{
+  "appId": "ai.raksha.guardian",
+  "appName": "Raksha AI",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}
