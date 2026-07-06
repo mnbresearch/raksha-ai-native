@@ -579,9 +579,24 @@ audio{width:100%;margin-top:8px}
     <p class="hint" data-i18n="vpinp">Protects and encrypts your evidence vault. Changing the PIN re-locks the vault (existing items stay readable with the old PIN's key until re-saved).</p>
     <button class="btn small secondary" onclick="setupPin(true)" data-i18n="changepin">Set / change PIN</button>
   </div>
+  <div class="card wide" style="margin-top:10px;border-color:var(--green)">
+    <div class="label" data-i18n="syscheck">🩺 Guardian System Check</div>
+    <p class="hint" data-i18n="syscheckp">Runs 20+ diagnostics: sensors, permissions, encryption, and every rescue service (family relay, routing, places, weather). Run this before relying on the app.</p>
+    <button class="btn" onclick="systemCheck()" data-i18n="runcheck">Run full diagnostics</button>
+    <div id="sysCheckResult" style="margin-top:8px;font-size:13px;line-height:1.9"></div>
+  </div>
   <div class="toggle-card">
     <div class="t-info"><b>🥸 <span data-i18n="stealth">Stealth launch</span></b><p data-i18n="stealthp">App always opens disguised as a calculator. Type your Safe Space PIN then "=" to unlock. Requires a PIN.</p></div>
     <label class="switch"><input type="checkbox" id="stealthToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🔒 <span data-i18n="pinstop">Require PIN to stop emergency</span></b><p data-i18n="pinstopp">Prevents an attacker from cancelling your SOS. Uses your Safe Space PIN.</p></div>
+    <label class="switch"><input type="checkbox" id="pinStopToggle"><span class="slider"></span></label>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="sosmsg">Custom SOS message</div>
+    <p class="hint" data-i18n="sosmsgp">Added to every emergency SMS — e.g. medical details or what to do.</p>
+    <input id="customSosMsg" placeholder="e.g. I'm diabetic. Call my father first: +91…">
   </div>
   <div class="card wide" style="margin-top:10px">
     <div class="label" data-i18n="routines">Guardian Routines — daily check-ins</div>
@@ -683,7 +698,18 @@ audio{width:100%;margin-top:8px}
 <script src="features.js"></script>
 <script src="brain.js"></script>
 <script src="guardian.js"></script>
+<!-- ================= ONBOARDING ================= -->
+<div class="modal" id="tourModal">
+  <div class="box" style="text-align:left">
+    <h3 id="tourTitle">Welcome</h3>
+    <p class="hint" id="tourBody" style="font-size:14px"></p>
+    <button class="btn" id="tourNext">Next</button>
+    <button class="btn secondary" id="tourSkip">Skip tour</button>
+  </div>
+</div>
+
 <script src="shield.js"></script>
+<script src="check.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>
