@@ -655,7 +655,13 @@ audio{width:100%;margin-top:8px}
     <div class="label" data-i18n="danger">Danger zone</div>
     <button class="btn danger" onclick="wipeAll()" data-i18n="wipe">Wipe ALL app data from this device</button>
   </div>
-  <p class="hint" style="margin-top:14px">Raksha AI · open source (MIT) · 100% on-device · no accounts · no tracking · Made for India 🇮🇳</p>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="spread">Spread the protection</div>
+    <button class="btn" onclick="shareApp()" data-i18n="shareapp">📤 Share Raksha AI with someone</button>
+    <button class="btn secondary" onclick="window.open('about.html','_blank')" data-i18n="aboutpage">🌐 View the landing page</button>
+    <button class="btn secondary" onclick="location.href='mailto:mridulnanda2004@gmail.com?subject=Raksha%20AI%20feedback'" data-i18n="feedback">💬 Send feedback</button>
+  </div>
+  <p class="hint" style="margin-top:14px" id="versionLine">Raksha AI v11 · open source (MIT) · 100% on-device · no accounts · no tracking · Made for India 🇮🇳</p>
 </div>
 
 <!-- ================= NAV ================= -->

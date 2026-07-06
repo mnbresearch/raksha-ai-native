@@ -137,6 +137,15 @@ if (!localStorage.getItem('raksha_lang') && (navigator.language || '').toLowerCa
   lang = 'hi'; store.set('lang', 'hi'); applyLang();
 }
 
+/* ================= SHARE THE APP (v11) ================= */
+function shareApp() {
+  const base = location.origin + location.pathname.replace(/index\.html$/, '');
+  const txt = `🛡️ Raksha AI — free AI safety companion (SOS, live family tracking, scam shield, evidence vault — 90+ features, no accounts, fully private).\nOpen: ${base}\nLearn more: ${base}about.html`;
+  if (navigator.share) navigator.share({ title: 'Raksha AI', text: txt }).catch(() => {});
+  else prompt('Copy and send:', txt);
+  bumpStat('checks');
+}
+
 /* ================= boot ================= */
 (function seedScore() { const { score } = computeScore(); if (!scoreHist.length) { scoreHist.push({ ts: Date.now(), s: score }); store.set('scorehist', scoreHist); } })();
 brainLog('🌐', 'v10 online — no-install tracker links, PDF case file, contact import, score history', 0);
