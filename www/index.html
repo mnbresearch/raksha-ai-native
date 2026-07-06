@@ -437,6 +437,7 @@ audio{width:100%;margin-top:8px}
   <h2 class="section" data-i18n="timeline">Incident Timeline</h2>
   <div id="vaultList"><p class="hint" data-i18n="vempty">Vault is empty.</p></div>
   <button class="btn secondary" onclick="vaultExport()" data-i18n="vexport">Export timeline (for lawyer / police)</button>
+  <button class="btn purple" onclick="vaultExportPDF()" data-i18n="vpdf">📄 Export court-ready PDF (with photos)</button>
   <h2 class="section" data-i18n="dvres">Support resources</h2>
   <div class="helpline"><div class="hl-info"><b>181</b><div data-i18n="hl181">Women Helpline — domestic abuse (24×7, all India)</div></div><a href="tel:181">📞</a></div>
   <div class="helpline"><div class="hl-info"><b>1091</b><div data-i18n="hl1091">Women Police Helpline</div></div><a href="tel:1091">📞</a></div>
@@ -549,6 +550,7 @@ audio{width:100%;margin-top:8px}
     <input id="cPhone" placeholder="Phone (+91…)" type="tel">
   </div>
   <button class="btn" id="addContact" data-i18n="addc">Add Contact</button>
+  <button class="btn secondary" onclick="importContacts()" data-i18n="importc">📇 Import from phone contacts</button>
   <div id="contactList"></div>
   <button class="btn purple" onclick="shareLive()">📍 <span data-i18n="sharenow">Share my live location now</span></button>
 
@@ -584,6 +586,7 @@ audio{width:100%;margin-top:8px}
     <div class="card"><div class="label" data-i18n="d_rep">Community reports</div><div class="value" id="dReports">0</div></div>
     <div class="card"><div class="label" data-i18n="d_days">Days protected</div><div class="value" id="dDays">1</div></div>
   </div>
+  <div class="card wide" style="margin-top:10px"><div class="label" data-i18n="d_hist">Safety score — last 24 hours</div><canvas id="scoreChart" style="width:100%;height:60px;margin-top:8px"></canvas></div>
   <div class="card wide" style="margin-top:10px"><div class="label" data-i18n="d_report">Today's report</div><div class="hint" id="dailyReport" style="margin-top:6px">—</div></div>
   <button class="btn secondary" onclick="shareWeekly()" data-i18n="sharewk">📤 Share my safety report with family</button>
 </div>
@@ -740,6 +743,7 @@ audio{width:100%;margin-top:8px}
 <script src="check.js"></script>
 <script src="extra.js"></script>
 <script src="refine.js"></script>
+<script src="v10.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>

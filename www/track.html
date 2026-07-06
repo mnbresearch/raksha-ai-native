@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>Raksha AI — Live Family Tracker</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1220;color:#e8eefc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh}
+header{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #223050}
+h1{font-size:17px}h1 span{color:#2ee6a8}
+.pill{font-size:11px;background:#141d30;border:1px solid #263457;color:#8fa3c8;padding:4px 10px;border-radius:99px}
+#map{height:52vh}
+.wrap{padding:14px 16px}
+.sos{background:#3a1220;border:1px solid #ff5470;color:#ffb3c0;border-radius:12px;padding:12px;margin-bottom:10px;font-size:14px;display:none;line-height:1.5}
+.sos.show{display:block}
+.sos a{color:#fff;font-weight:700}
+.member{display:flex;justify-content:space-between;align-items:center;background:#141d30;border:1px solid #223050;border-radius:12px;padding:12px;margin-top:8px}
+.member b{font-size:15px}
+.member .sub{font-size:12px;color:#8fa3c8;margin-top:2px}
+.member a{color:#4d9fff;text-decoration:none;font-size:13px}
+.hint{font-size:12px;color:#8fa3c8;margin-top:12px;line-height:1.5}
+input,button{padding:12px;border-radius:12px;border:1px solid #2b3b63;background:#1a2540;color:#e8eefc;font-size:15px}
+button{background:#2ee6a8;color:#08101f;font-weight:700;border:none;cursor:pointer}
+.setup{max-width:400px;margin:8vh auto;padding:0 20px;display:flex;flex-direction:column;gap:10px}
+audio{display:none}
+</style>
+</head>
+<body>
+<header><h1>🛡️ Raksha <span>AI</span> — Live Tracker</h1><span class="pill" id="status">connecting…</span></header>
+
+<div class="setup" id="setup" style="display:none">
+  <h2 style="font-size:18px">Enter the family code</h2>
+  <p class="hint">Ask your family member for their Raksha AI family code. No app or account needed — this page shows their live location in your browser.</p>
+  <input id="codeInput" placeholder="e.g. sharma-tigers-9481">
+  <button onclick="start(document.getElementById('codeInput').value)">Start tracking</button>
+</div>
+
+<div id="trackerUI" style="display:none">
+  <div id="map"></div>
+  <div class="wrap">
+    <div class="sos" id="sosBanner"></div>
+    <div id="members"><p class="hint">Waiting for the first location update… Members appear here as soon as they broadcast (every 15 s while their app is open, continuous on the Android app).</p></div>
+    <p class="hint">🔒 This page only receives what your family member chooses to broadcast. Powered by the open-source ntfy.sh relay. If an SOS arrives, this page beeps, shows their location, and keeps updating it live. In an emergency call <b>112</b>.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+let map = null;
+const markers = {}, seen = {};
+
+function esc(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function beep(times) {
+  try {
+    const c = new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < times; i++) {
+      const o = c.createOscillator(), g = c.createGain();
+      o.frequency.value = 1100; g.gain.value = 0.3;
+      o.connect(g); g.connect(c.destination);
+      o.start(c.currentTime + i * 0.35); o.stop(c.currentTime + i * 0.35 + 0.18);
+    }
+  } catch(e) {}
+}
+
+function start(codeRaw) {
+  const code = (codeRaw || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  if (!code) return;
+  history.replaceState(null, '', '?fam=' + encodeURIComponent(code));
+  $('setup').style.display = 'none';
+  $('trackerUI').style.display = 'block';
+  map = L.map('map').setView([22.97, 78.65], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+
+  const es = new EventSource('https://ntfy.sh/raksha-fam-' + code + '/sse');
+  es.onopen = () => { $('status').textContent = '🟢 live'; };
+  es.onerror = () => { $('status').textContent = 'reconnecting…'; };
+  es.onmessage = ev => {
+    try {
+      const n = JSON.parse(ev.data);
+      if (n.attachment && n.attachment.url) { addAudio(n); return; }
+      if (!n.message) return;
+      const m = JSON.parse(n.message);
+      if (!m || !m.n) return;
+      update(m);
+    } catch(e) {}
+  };
+}
+
+function update(m) {
+  seen[m.n] = m;
+  const sos = m.s === 'SOS';
+  if (m.la != null) {
+    const color = sos ? '#ff5470' : '#b18cff';
+    if (markers[m.n]) { markers[m.n].setLatLng([m.la, m.lo]); markers[m.n].setStyle({ color, fillColor: color }); }
+    else markers[m.n] = L.circleMarker([m.la, m.lo], { radius: 10, color, fillColor: color, fillOpacity: .9 }).addTo(map).bindPopup(esc(m.n));
+    if (sos || Object.keys(markers).length === 1) map.setView([m.la, m.lo], sos ? 16 : 14);
+  }
+  if (sos) {
+    const b = $('sosBanner');
+    b.classList.add('show');
+    b.innerHTML = '🚨 <b>' + esc(m.n) + ' NEEDS HELP</b>' + (m.r ? ' — ' + esc(m.r) : '') +
+      (m.la != null ? ' · <a href="https://maps.google.com/?q=' + m.la + ',' + m.lo + '" target="_blank">open in Google Maps</a>' : '') +
+      ' · Call them, then call <a href="tel:112">112</a> if needed.';
+    beep(6);
+    if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+    if ('Notification' in window && Notification.permission === 'granted')
+      new Notification('🚨 ' + m.n + ' NEEDS HELP', { body: m.r || 'SOS from Raksha AI' });
+  }
+  render();
+}
+
+function addAudio(n) {
+  const b = $('sosBanner');
+  b.classList.add('show');
+  b.innerHTML += '<div style="margin-top:8px">📻 Rescue Radio: <audio controls style="display:block;width:100%;margin-top:4px" src="' + esc(n.attachment.url) + '"></audio></div>';
+}
+
+function render() {
+  const el = $('members');
+  el.innerHTML = '';
+  Object.values(seen).forEach(m => {
+    const age = Math.round((Date.now() - m.ts) / 1000);
+    const d = document.createElement('div');
+    d.className = 'member';
+    d.innerHTML = '<div><b>' + (m.s === 'SOS' ? '🚨 ' : '🟣 ') + esc(m.n) + '</b><div class="sub">' +
+      (m.s === 'SOS' ? 'NEEDS HELP · ' : '') + (age < 90 ? age + 's ago' : Math.round(age / 60) + 'm ago') + '</div></div>' +
+      (m.la != null ? '<a href="https://maps.google.com/?q=' + m.la + ',' + m.lo + '" target="_blank">directions ↗</a>' : '');
+    el.appendChild(d);
+  });
+}
+setInterval(render, 20000);
+
+const q = new URLSearchParams(location.search).get('fam');
+if (q) start(q); else $('setup').style.display = 'flex';
+</script>
+</body>
+</html>
