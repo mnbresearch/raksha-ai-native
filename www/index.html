@@ -216,6 +216,13 @@ audio{width:100%;margin-top:8px}
   <button class="btn" id="tripBtn" data-i18n="starttrip">Start Trip</button>
   <button class="btn secondary" id="clearDest" data-i18n="cleardest">Clear Destination</button>
   <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="cablog">🚖 Cab Logger — before you get in</div>
+    <p class="hint" data-i18n="cablogp">Log the plate and driver. Instantly shared with Family Live and saved as evidence.</p>
+    <div class="row2"><input id="cabPlate" placeholder="Plate (DL 1A 1234)"><input id="cabDriver" placeholder="Driver / app"></div>
+    <button class="btn small" onclick="logCab()" data-i18n="logcab">Log & alert family</button>
+    <div id="cabList"></div>
+  </div>
+  <div class="card wide" style="margin-top:10px">
     <div class="label" data-i18n="crumbs">Breadcrumb trail (evidence of your route)</div>
     <p class="hint" data-i18n="crumbsp">Your path is recorded automatically during trips, walks, and emergencies — on this device only.</p>
     <button class="btn small secondary" onclick="showTrail()" data-i18n="viewtrail">View trail</button>
@@ -290,7 +297,7 @@ audio{width:100%;margin-top:8px}
   <div class="toggle-card">
     <div class="t-info"><b>🗣️ <span data-i18n="voiceg">Voice Guardian</span></b>
       <p data-i18n="voicegp">Listens for your secret phrase, or "help me" / "bachao" — silently triggers the emergency workflow.</p>
-      <input id="secretPhrase" placeholder="Secret phrase" value="blue notebook">
+      <input id="secretPhrase" placeholder="Secret phrases (comma-separated)" value="blue notebook">
     </div>
     <label class="switch"><input type="checkbox" id="voiceToggle"><span class="slider"></span></label>
   </div>
@@ -325,6 +332,15 @@ audio{width:100%;margin-top:8px}
     <div class="t-info"><b>🎥 <span data-i18n="autorec">Auto Evidence Recording</span></b><p data-i18n="autorecp">When the Guardian Brain's threat level crosses 60%, the microphone starts recording automatically.</p></div>
     <label class="switch"><input type="checkbox" id="autoRecToggle"><span class="slider"></span></label>
   </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>📸 <span data-i18n="burst">Photo Evidence Burst</span></b><p data-i18n="burstp">During an emergency, the back camera silently captures a photo every 20 seconds (max 6) into your evidence list.</p></div>
+    <label class="switch"><input type="checkbox" id="photoBurstToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🗣️ <span data-i18n="voicechk">Answer check-ins by voice</span></b><p data-i18n="voicechkp">When a check-in appears, just say "I'm okay" to dismiss it, or "help" to escalate — no need to touch the phone.</p></div>
+    <label class="switch"><input type="checkbox" id="voiceCheckinToggle"><span class="slider"></span></label>
+  </div>
+  <p class="hint">🤫 <b data-i18n="silent">Silent SOS:</b> <span data-i18n="silentp">press and hold the clock (top-right) for 3 seconds — no visible change, but recording starts and your family + volunteers are alerted with your location. Hold again to stop.</span></p>
 </div>
 
 <!-- ================= WALK WITH ME ================= -->
@@ -565,6 +581,7 @@ audio{width:100%;margin-top:8px}
     <div class="card"><div class="label" data-i18n="d_days">Days protected</div><div class="value" id="dDays">1</div></div>
   </div>
   <div class="card wide" style="margin-top:10px"><div class="label" data-i18n="d_report">Today's report</div><div class="hint" id="dailyReport" style="margin-top:6px">—</div></div>
+  <button class="btn secondary" onclick="shareWeekly()" data-i18n="sharewk">📤 Share my safety report with family</button>
 </div>
 
 <!-- ================= SETTINGS ================= -->
@@ -709,7 +726,11 @@ audio{width:100%;margin-top:8px}
 </div>
 
 <script src="shield.js"></script>
+<!-- floating SOS bubble -->
+<div id="sosBubble" style="position:fixed;right:14px;bottom:92px;width:58px;height:58px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;z-index:450;box-shadow:0 4px 18px rgba(255,84,112,.5);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none">SOS</div>
+
 <script src="check.js"></script>
+<script src="extra.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>

@@ -502,10 +502,10 @@ function startVoice() {
   S.recog = new SR();
   S.recog.continuous = true; S.recog.interimResults = true; S.recog.lang = 'en-IN';
   S.recog.onresult = ev => {
-    const phrase = $('secretPhrase').value.trim().toLowerCase();
+    const phrases = $('secretPhrase').value.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
     for (let i = ev.resultIndex; i < ev.results.length; i++) {
       const txt = ev.results[i][0].transcript.toLowerCase();
-      if ((phrase && txt.includes(phrase)) || txt.includes('help me') || txt.includes('bachao') || txt.includes('बचाओ')) {
+      if (phrases.some(p => txt.includes(p)) || txt.includes('help me') || txt.includes('bachao') || txt.includes('बचाओ')) {
         stopVoice(); $('voiceToggle').checked = false;
         startEmergency('Secret phrase / distress word detected');
         return;
