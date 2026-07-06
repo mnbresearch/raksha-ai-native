@@ -163,6 +163,7 @@ audio{width:100%;margin-top:8px}
 
 <!-- ================= HOME ================= -->
 <div class="page active" id="page-home">
+  <div class="banner ok-banner" id="briefBanner"></div>
   <div class="orb-wrap">
     <div class="orb" id="orb">
       <div class="status-emoji" id="orbEmoji">🛡️</div>
@@ -214,6 +215,13 @@ audio{width:100%;margin-top:8px}
   </div>
   <button class="btn" id="tripBtn" data-i18n="starttrip">Start Trip</button>
   <button class="btn secondary" id="clearDest" data-i18n="cleardest">Clear Destination</button>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="crumbs">Breadcrumb trail (evidence of your route)</div>
+    <p class="hint" data-i18n="crumbsp">Your path is recorded automatically during trips, walks, and emergencies — on this device only.</p>
+    <button class="btn small secondary" onclick="showTrail()" data-i18n="viewtrail">View trail</button>
+    <button class="btn small secondary" onclick="exportGPX()" data-i18n="gpx">Export GPX</button>
+    <button class="btn small danger" onclick="clearTrail()" data-i18n="cleartrail">Clear</button>
+  </div>
 </div>
 
 <!-- ================= EMERGENCY ================= -->
@@ -385,6 +393,8 @@ audio{width:100%;margin-top:8px}
   <input id="iceMeds" placeholder="Current medications">
   <input id="iceContact" placeholder="Emergency contact (name + phone)">
   <button class="btn" onclick="saveIce()" data-i18n="icesave">Save card</button>
+  <button class="btn purple" onclick="iceWallpaper()" data-i18n="icewall">🖼️ Generate lock-screen wallpaper</button>
+  <p class="hint" data-i18n="icewallp">Creates an image with your ICE details — set it as your lock screen so responders see it without unlocking your phone.</p>
 </div>
 
 <!-- ================= SAFETY TIPS ================= -->
@@ -488,6 +498,19 @@ audio{width:100%;margin-top:8px}
   <div id="commMap"></div>
   <div id="commList"></div>
   <button class="btn secondary" onclick="shareReports()" data-i18n="commshare">Share my reports</button>
+
+  <h2 class="section">🦺 <span data-i18n="volshield">Volunteer Shield — city alert network</span></h2>
+  <p class="hint" data-i18n="volshieldp">Opt in to your city's channel. If someone nearby triggers SOS with broadcasting on, volunteers in the same city get their live location instantly — because the fastest help is often the person 200 metres away. Anonymous, opt-in, free (ntfy.sh relay).</p>
+  <input id="volCity" placeholder="Your city (e.g. delhi, mumbai, faridabad)">
+  <div class="toggle-card">
+    <div class="t-info"><b data-i18n="volbe">🦺 Be a volunteer</b><p data-i18n="volbep">Get alerted when someone in your city needs help (while the app is open).</p></div>
+    <label class="switch"><input type="checkbox" id="volToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b data-i18n="volbc">📡 Broadcast my SOS to city volunteers</b><p data-i18n="volbcp">During an emergency, also alert nearby volunteers with your location.</p></div>
+    <label class="switch"><input type="checkbox" id="volBroadcast"><span class="slider"></span></label>
+  </div>
+  <div class="banner warn-banner" id="volAlert"></div>
 </div>
 
 <!-- ================= HELPLINES ================= -->
@@ -660,6 +683,7 @@ audio{width:100%;margin-top:8px}
 <script src="features.js"></script>
 <script src="brain.js"></script>
 <script src="guardian.js"></script>
+<script src="shield.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>
