@@ -1,6 +1,6 @@
 // Raksha AI service worker — offline app shell
-const CACHE = 'raksha-v8';
-const ASSETS = ['.', 'index.html', 'app.js', 'modes.js', 'features.js', 'brain.js', 'guardian.js', 'shield.js', 'check.js', 'extra.js', 'manifest.json', 'icon.svg',
+const CACHE = 'raksha-v9';
+const ASSETS = ['.', 'index.html', 'app.js', 'modes.js', 'features.js', 'brain.js', 'guardian.js', 'shield.js', 'check.js', 'extra.js', 'refine.js', 'manifest.json', 'icon.svg',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'];
 

@@ -325,6 +325,10 @@ audio{width:100%;margin-top:8px}
     <button class="btn amber" style="width:110px;margin:0" onclick="startStrobe()" data-i18n="flash">Flash</button>
   </div>
   <div class="toggle-card">
+    <div class="t-info"><b>🔆 <span data-i18n="torch">Flashlight</span></b><p data-i18n="torchp">Real camera torch (Android Chrome). Falls back to a bright white screen elsewhere.</p></div>
+    <label class="switch"><input type="checkbox" id="torchToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
     <div class="t-info"><b>🎯 <span data-i18n="drill">SOS Practice Drill</span></b><p data-i18n="drillp">Rehearse the emergency flow safely so your hands know what to do when it's real. No messages are sent.</p></div>
     <button class="btn secondary" style="width:110px;margin:0" onclick="sosDrill()" data-i18n="practice">Practice</button>
   </div>
@@ -610,6 +614,10 @@ audio{width:100%;margin-top:8px}
     <div class="t-info"><b>🔒 <span data-i18n="pinstop">Require PIN to stop emergency</span></b><p data-i18n="pinstopp">Prevents an attacker from cancelling your SOS. Uses your Safe Space PIN.</p></div>
     <label class="switch"><input type="checkbox" id="pinStopToggle"><span class="slider"></span></label>
   </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>📞 <span data-i18n="autocall">Auto-call primary contact on SOS</span></b><p data-i18n="autocallp">5 seconds after an emergency starts, the phone dials your first trusted contact automatically.</p></div>
+    <label class="switch"><input type="checkbox" id="autoCallToggle"><span class="slider"></span></label>
+  </div>
   <div class="card wide" style="margin-top:10px">
     <div class="label" data-i18n="sosmsg">Custom SOS message</div>
     <p class="hint" data-i18n="sosmsgp">Added to every emergency SMS — e.g. medical details or what to do.</p>
@@ -731,6 +739,7 @@ audio{width:100%;margin-top:8px}
 
 <script src="check.js"></script>
 <script src="extra.js"></script>
+<script src="refine.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>
