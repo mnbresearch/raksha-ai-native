@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0b1220">
+<title>Raksha AI — Your Personal AI Safety Companion</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#0b1220; --card:#141d30; --card2:#1a2540; --text:#e8eefc; --muted:#8fa3c8;
+  --green:#2ee6a8; --amber:#ffb84d; --red:#ff5470; --blue:#4d9fff; --purple:#b18cff; --ring:#2ee6a8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans',sans-serif;min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+header{padding:16px 18px 6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+header h1{font-size:20px;font-weight:800}
+header h1 span{color:var(--green)}
+.hbtns{display:flex;gap:8px;align-items:center}
+.pill{font-size:11px;background:var(--card);border:1px solid #263457;color:var(--muted);padding:5px 11px;border-radius:99px;cursor:pointer}
+.page{display:none;padding:12px 16px 24px;animation:fade .25s}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.backbar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.backbar button{background:var(--card);border:1px solid #2b3b63;color:var(--text);border-radius:10px;padding:7px 13px;font-size:14px;cursor:pointer}
+.backbar h2{font-size:17px}
+/* orb */
+.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:14px 0 6px}
+.orb{width:165px;height:165px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  background:radial-gradient(circle at 35% 30%, #1e3a5c, #0e1a30 70%);
+  box-shadow:0 0 40px 4px color-mix(in srgb, var(--ring) 35%, transparent), inset 0 0 30px rgba(46,230,168,.15);
+  border:2px solid color-mix(in srgb, var(--ring) 60%, transparent);
+  transition:box-shadow 1s,border-color 1s;animation:breathe 3.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.orb .status-emoji{font-size:32px}
+.orb .status-text{font-size:15px;font-weight:700;margin-top:4px}
+.orb .score{font-size:12px;color:var(--muted);margin-top:2px}
+.orb-caption{margin-top:10px;color:var(--muted);font-size:12.5px;text-align:center;line-height:1.5;max-width:340px}
+/* cards */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.card{background:var(--card);border:1px solid #223050;border-radius:14px;padding:12px}
+.card .label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.card .value{font-size:16px;font-weight:700;margin-top:4px}
+.card.wide{grid-column:1/-1}
+.card.tappable{cursor:pointer}
+.card.tappable:active{transform:scale(.985)}
+.mode-card{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid #223050;border-radius:16px;padding:15px;margin-top:10px;cursor:pointer}
+.mode-card:active{transform:scale(.985)}
+.mode-card .mi{font-size:28px;width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--card2);flex-shrink:0}
+.mode-card b{font-size:15px}
+.mode-card p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;color:#08101f;background:var(--green)}
+.btn.secondary{background:var(--card2);color:var(--text);border:1px solid #2b3b63}
+.btn.danger{background:var(--red);color:#fff}
+.btn.amber{background:var(--amber)}
+.btn.purple{background:var(--purple)}
+.btn.small{width:auto;display:inline-block;padding:9px 14px;font-size:13px;margin-right:6px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5}
+h2.section{font-size:16px;margin:16px 0 8px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.55}
+#map,#tripMap,#commMap{height:210px;border-radius:14px;margin-top:10px;z-index:1}
+/* nav */
+nav{position:fixed;bottom:0;left:0;right:0;background:#0e1626;border-top:1px solid #223050;display:flex;z-index:500;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:none;color:var(--muted);font-size:10.5px;padding:9px 0 7px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button .ic{font-size:20px}
+nav button.active{color:var(--green)}
+/* SOS */
+.sos-wrap{display:flex;flex-direction:column;align-items:center;margin-top:6px}
+#sosBtn{width:150px;height:150px;border-radius:50%;border:6px solid #ff8ba0;background:var(--red);color:#fff;font-size:25px;font-weight:900;cursor:pointer;box-shadow:0 0 35px rgba(255,84,112,.5);user-select:none;-webkit-user-select:none}
+.stages{margin-top:14px}
+.stage{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #1d2a47}
+.stage .dot{width:22px;height:22px;border-radius:50%;background:var(--card2);border:2px solid #2b3b63;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
+.stage.done .dot{background:var(--green);border-color:var(--green);color:#08101f;font-weight:900}
+.stage.active-stage .dot{border-color:var(--amber);color:var(--amber);animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.stage .txt{font-size:13.5px;line-height:1.45}
+.stage .txt small{color:var(--muted)}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(4,8,16,.93);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex}
+.modal .box{background:var(--card);border:1px solid #2b3b63;border-radius:20px;padding:24px 20px;width:100%;max-width:380px;text-align:center;max-height:85vh;overflow-y:auto}
+.modal h3{font-size:19px;margin-bottom:8px}
+.countdown{font-size:50px;font-weight:900;color:var(--amber);margin:8px 0}
+/* fake call */
+#fakeCallScreen{position:fixed;inset:0;background:linear-gradient(180deg,#101828,#05080f);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:70px 30px 60px}
+#fakeCallScreen.show{display:flex}
+#fakeCallScreen .avatar{width:96px;height:96px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 16px}
+#fakeCallScreen .name{font-size:28px;font-weight:700;text-align:center}
+#fakeCallScreen .sub{color:var(--muted);margin-top:6px;text-align:center}
+#fakeCallScreen .actions{display:flex;gap:70px}
+.callbtn{width:72px;height:72px;border-radius:50%;border:none;font-size:30px;cursor:pointer;color:#fff}
+.callbtn.answer{background:#2ecc71}
+.callbtn.decline{background:var(--red)}
+/* disguise calculator */
+#disguise{position:fixed;inset:0;background:#111;z-index:3000;display:none;flex-direction:column;padding:20px;color:#fff}
+#disguise.show{display:flex}
+#calcDisplay{flex:1;display:flex;align-items:flex-end;justify-content:flex-end;font-size:52px;font-weight:300;padding:20px 10px;word-break:break-all}
+.calcgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.calcgrid button{padding:20px 0;font-size:24px;border:none;border-radius:50px;background:#333;color:#fff;cursor:pointer}
+.calcgrid button.op{background:#f90}
+.calcgrid button.fn{background:#a5a5a5;color:#000}
+/* lists & inputs */
+.contact,.list-item{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid #223050;border-radius:12px;padding:12px;margin-top:8px;gap:8px}
+.contact .info b,.list-item b{font-size:14.5px}
+.contact .info div,.list-item .sub2{font-size:12px;color:var(--muted);margin-top:2px}
+.xbtn{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;flex-shrink:0}
+input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #2b3b63;background:var(--card2);color:var(--text);font-size:15px;margin-top:8px;font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+.row2{display:flex;gap:8px}
+.toggle-card{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid #223050;border-radius:14px;padding:14px;margin-top:10px}
+.toggle-card .t-info{padding-right:10px;flex:1}
+.toggle-card .t-info b{font-size:14.5px}
+.toggle-card .t-info p{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
+.switch{position:relative;width:50px;height:28px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#2b3b63;border-radius:99px;cursor:pointer;transition:.25s}
+.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.25s}
+.switch input:checked + .slider{background:var(--green)}
+.switch input:checked + .slider:before{transform:translateX(22px)}
+.banner{background:#3a1220;border:1px solid var(--red);color:#ffb3c0;border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px;display:none;line-height:1.5}
+.banner.show{display:block}
+.ok-banner{background:#0f2b22;border-color:var(--green);color:#a8f0d5}
+.warn-banner{background:#332508;border-color:var(--amber);color:#ffd9a0}
+audio{width:100%;margin-top:8px}
+.rec-item{background:var(--card);border:1px solid #223050;border-radius:12px;padding:10px;margin-top:8px;font-size:13px}
+/* helpline */
+.helpline{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid #223050;border-radius:12px;padding:12px;margin-top:8px}
+.helpline .hl-info b{font-size:14.5px}
+.helpline .hl-info div{font-size:11.5px;color:var(--muted);margin-top:2px}
+.helpline a{background:var(--green);color:#08101f;text-decoration:none;font-weight:800;padding:9px 16px;border-radius:10px;font-size:14px;flex-shrink:0}
+.helpline a.red{background:var(--red);color:#fff}
+/* scam verdict */
+.gauge{height:10px;background:#2b3b63;border-radius:99px;margin-top:10px;overflow:hidden}
+.gauge div{height:100%;border-radius:99px;transition:width .6s}
+/* route cards */
+.route-opt{background:var(--card);border:2px solid #223050;border-radius:14px;padding:12px;margin-top:8px;cursor:pointer}
+.route-opt.sel{border-color:var(--green)}
+.route-opt .r-head{display:flex;justify-content:space-between;font-weight:700;font-size:14.5px}
+.route-opt .r-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.badge{font-size:10.5px;padding:3px 8px;border-radius:99px;background:var(--card2);border:1px solid #2b3b63;color:var(--muted);margin-left:6px}
+.badge.g{color:var(--green);border-color:var(--green)}
+.badge.a{color:var(--amber);border-color:var(--amber)}
+.tabs2{display:flex;gap:6px;margin-top:10px}
+.tabs2 button{flex:1;padding:9px;border-radius:10px;border:1px solid #2b3b63;background:var(--card2);color:var(--muted);font-size:13px;cursor:pointer}
+.tabs2 button.on{background:var(--green);color:#08101f;font-weight:700;border-color:var(--green)}
+.breath-circle{width:140px;height:140px;border-radius:50%;border:3px solid var(--blue);margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--blue);transition:transform 4s ease-in-out}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Raksha <span>AI</span></h1>
+  <div class="hbtns">
+    <span class="pill" id="langBtn">हिंदी</span>
+    <span class="pill" id="clockPill">--:--</span>
+  </div>
+</header>
+
+<!-- ================= HOME ================= -->
+<div class="page active" id="page-home">
+  <div class="orb-wrap">
+    <div class="orb" id="orb">
+      <div class="status-emoji" id="orbEmoji">🛡️</div>
+      <div class="status-text" id="orbStatus">Starting…</div>
+      <div class="score" id="orbScore">Safety Score: --</div>
+    </div>
+    <div class="orb-caption" id="orbCaption">Your AI Guardian is initializing sensors…</div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="label" data-i18n="police">Nearby Police</div><div class="value" id="policeDist">—</div></div>
+    <div class="card"><div class="label" data-i18n="hospital">Nearby Hospital</div><div class="value" id="hospDist">—</div></div>
+    <div class="card tappable" onclick="go('circle')"><div class="label" data-i18n="contacts">Trusted Contacts</div><div class="value" id="contactCount">0</div></div>
+    <div class="card"><div class="label" data-i18n="risk">Area Risk</div><div class="value" id="areaRisk">—</div></div>
+    <div class="card"><div class="label" data-i18n="weather">Weather</div><div class="value" id="weatherVal" style="font-size:13.5px">—</div></div>
+    <div class="card"><div class="label" data-i18n="battery">Battery Guardian</div><div class="value" id="batteryVal" style="font-size:13.5px">—</div></div>
+    <div class="card wide"><div class="label" data-i18n="senses">Guardian senses</div><div class="value" id="senseLine" style="font-size:13px;font-weight:500;line-height:1.6;color:var(--muted)">📍 GPS: waiting · 📳 Motion: off · 🎙️ Voice: off · 🚗 Crash: off</div></div>
+  </div>
+  <div class="mode-card" onclick="go('walk')" style="border-color:var(--green)"><div class="mi">🚶‍♀️</div><div><b data-i18n="walkme">Walk With Me</b><p data-i18n="walkmep">Live escort mode: thumb-on-screen deadman switch, scream detection, screen stays awake. Release your thumb and don't return — help is called.</p></div></div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="stimer">Safety Timer — "I should be safe by…"</div>
+    <div class="row2">
+      <select id="timerMins"><option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option><option value="60">1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option></select>
+      <button class="btn" id="timerBtn" style="margin-top:8px" data-i18n="timerstart">Start</button>
+    </div>
+    <div class="hint" id="timerStatus" data-i18n="timerhint">If you don't mark yourself safe before the timer ends, your Guardian checks in — then alerts your circle.</div>
+  </div>
+  <div id="map"></div>
+  <div class="grid3">
+    <button class="btn amber" style="margin-top:10px;font-size:13px" onclick="showFakeCall()">📞 <span data-i18n="fakecall">Fake Call</span></button>
+    <button class="btn danger" style="margin-top:10px;font-size:13px" id="alarmBtnHome">🔊 <span data-i18n="alarm">Alarm</span></button>
+    <button class="btn purple" style="margin-top:10px;font-size:13px" onclick="shareLive()">📍 <span data-i18n="sharloc">Share Live</span></button>
+  </div>
+  <div class="grid" style="margin-top:0">
+    <button class="btn" style="font-size:13px" onclick="startCompanion()">🎧 <span data-i18n="companion">AI Companion Call</span></button>
+    <button class="btn secondary" style="font-size:13px" onclick="escapeRoute()">🏃 <span data-i18n="escape">Nearest Safe Place</span></button>
+  </div>
+</div>
+
+<!-- ================= TRIP ================= -->
+<div class="page" id="page-trip">
+  <h2 class="section">🚕 <span data-i18n="tripmode">Guardian Trip Mode</span></h2>
+  <p class="hint" data-i18n="triphint">Tap the map to set your destination. The Guardian finds real road routes and rates each for safety. During the trip it watches for route deviation, unexpected stops, and ETA overrun — and checks on you before escalating.</p>
+  <div id="tripMap"></div>
+  <div id="routeOptions"></div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="tripstatus">Trip status</div>
+    <div class="value" id="tripStatus">No trip active</div>
+    <div class="hint" id="tripDetail">Destination not set.</div>
+  </div>
+  <button class="btn" id="tripBtn" data-i18n="starttrip">Start Trip</button>
+  <button class="btn secondary" id="clearDest" data-i18n="cleardest">Clear Destination</button>
+</div>
+
+<!-- ================= EMERGENCY ================= -->
+<div class="page" id="page-emergency">
+  <h2 class="section">🚨 <span data-i18n="emergency">Emergency</span></h2>
+  <div class="sos-wrap">
+    <button id="sosBtn">HOLD<br>SOS</button>
+    <p class="hint" style="text-align:center" data-i18n="soshint">Press and hold 1.5 seconds to trigger the full emergency workflow.</p>
+  </div>
+  <div class="banner" id="emBanner"></div>
+  <div class="stages" id="stages">
+    <div class="stage" data-stage="1"><div class="dot">1</div><div class="txt"><b data-i18n="st1">Check-in</b><br><small data-i18n="st1s">"Are you okay?" — 15 second response window</small></div></div>
+    <div class="stage" data-stage="2"><div class="dot">2</div><div class="txt"><b data-i18n="st2">Evidence recording</b><br><small data-i18n="st2s">Microphone recording starts (saved to your Evidence Vault)</small></div></div>
+    <div class="stage" data-stage="3"><div class="dot">3</div><div class="txt"><b data-i18n="st3">Live location captured</b><br><small data-i18n="st3s">GPS position locked with map link</small></div></div>
+    <div class="stage" data-stage="4"><div class="dot">4</div><div class="txt"><b data-i18n="st4">Trusted contacts alerted</b><br><small data-i18n="st4s">SMS / WhatsApp with your location opens automatically</small></div></div>
+    <div class="stage" data-stage="5"><div class="dot">5</div><div class="txt"><b data-i18n="st5">Call for help</b><br><small data-i18n="st5s">One-tap call to your primary contact or 112</small></div></div>
+  </div>
+  <button class="btn secondary" id="stopEmergency" style="display:none">✅ <span data-i18n="imsafe">I'm safe — stop emergency</span></button>
+  <div class="toggle-card">
+    <div class="t-info"><b>🚗 <span data-i18n="crash">Crash / Accident Detection</span></b>
+      <p data-i18n="crashp">Detects a violent impact while you're moving in a vehicle, then a 20-second countdown before auto-alerting your circle.</p>
+    </div>
+    <label class="switch"><input type="checkbox" id="crashToggle"><span class="slider"></span></label>
+  </div>
+  <h2 class="section">🎙️ <span data-i18n="recent">Recent recordings</span></h2>
+  <div id="recList"><p class="hint" data-i18n="norec">No recordings yet. Recordings save to your encrypted Evidence Vault.</p></div>
+</div>
+
+<!-- ================= MODES HUB ================= -->
+<div class="page" id="page-modes">
+  <h2 class="section">🛡️ <span data-i18n="modes">Protection Modes</span></h2>
+  <div class="mode-card" onclick="go('brain')" style="border-color:var(--purple)"><div class="mi">🧠</div><div><b data-i18n="m_brain">Guardian Brain</b><p data-i18n="m_brainp">See what your AI sees: live sensor fusion, threat meter, and an explainable reasoning log. It also learns YOUR normal — places and hours — fully on-device.</p></div></div>
+  <div class="mode-card" onclick="go('assistant')" style="border-color:var(--blue)"><div class="mi">💬</div><div><b data-i18n="m_asst">Guardian Assistant</b><p data-i18n="m_asstp">Ask anything: "someone is following me", "I got a KYC message", "my husband hit me". Instant guidance + one-tap actions. Works offline.</p></div></div>
+  <div class="mode-card" onclick="openVaultGate()"><div class="mi">🔐</div><div><b data-i18n="m_dv">Safe Space (Domestic Violence)</b><p data-i18n="m_dvp">PIN-locked, encrypted evidence vault. Photos, recordings, notes, incident timeline. Disguised quick-exit.</p></div></div>
+  <div class="mode-card" onclick="go('scam')"><div class="mi">🕵️</div><div><b data-i18n="m_scam">Scam Shield</b><p data-i18n="m_scamp">Paste any SMS/WhatsApp message or number. AI checks it against Indian fraud patterns — UPI, KYC, digital arrest, and more.</p></div></div>
+  <div class="mode-card" onclick="go('elder')"><div class="mi">🧓</div><div><b data-i18n="m_elder">Elder Care</b><p data-i18n="m_elderp">Periodic well-being check-ins, fall detection, medicine reminders, Elder Line 14567.</p></div></div>
+  <div class="mode-card" onclick="go('child')"><div class="mi">🧒</div><div><b data-i18n="m_child">Child Safety</b><p data-i18n="m_childp">Safe-arrival alerts, school trip watch, CHILDLINE 1098.</p></div></div>
+  <div class="mode-card" onclick="go('mind')"><div class="mi">💙</div><div><b data-i18n="m_mind">Mind Guardian</b><p data-i18n="m_mindp">Mental-health support: Tele-MANAS 14416, KIRAN, grounding exercise.</p></div></div>
+  <div class="mode-card" onclick="go('community')"><div class="mi">🗺️</div><div><b data-i18n="m_comm">Community Shield</b><p data-i18n="m_commp">Mark unsafe spots — harassment, dark streets, theft. Your Guardian factors them into your safety score.</p></div></div>
+</div>
+
+<!-- ================= MORE ================= -->
+<div class="page" id="page-more">
+  <h2 class="section">☰ <span data-i18n="more">More</span></h2>
+  <div class="mode-card" onclick="go('helplines')"><div class="mi">📞</div><div><b data-i18n="m_help">India Helplines</b><p data-i18n="m_helpp">All-India emergency numbers — 112, women 181/1091, child 1098, cyber 1930, elder 14567, mental health 14416.</p></div></div>
+  <div class="mode-card" onclick="go('circle')"><div class="mi">👥</div><div><b data-i18n="m_circle">Trusted Circle</b><p data-i18n="m_circlep">People alerted in an emergency. Share live location any time.</p></div></div>
+  <div class="mode-card" onclick="go('dashboard')"><div class="mi">📊</div><div><b data-i18n="m_dash">Safety Dashboard</b><p data-i18n="m_dashp">Your daily safety report — trips, check-ins, scams screened, alerts.</p></div></div>
+  <div class="mode-card" onclick="go('tools')"><div class="mi">🧰</div><div><b data-i18n="m_tools">Quick Tools</b><p data-i18n="m_toolsp">Fake call, Voice Guardian secret phrase, fall detection, loud alarm.</p></div></div>
+  <div class="mode-card" onclick="go('ice')"><div class="mi">🆘</div><div><b data-i18n="ice">Emergency Medical Card</b><p data-i18n="icep">Offline ICE card — blood group, allergies, conditions — for first responders.</p></div></div>
+  <div class="mode-card" onclick="go('tips')"><div class="mi">📖</div><div><b data-i18n="tips">Safety Playbook</b><p data-i18n="tipsp">Practical safety knowledge: cabs, night walks, online safety, self-defence basics.</p></div></div>
+  <div class="mode-card" onclick="go('settings')"><div class="mi">⚙️</div><div><b data-i18n="m_set">Settings</b><p data-i18n="m_setp">Language, vault PIN, wipe all data.</p></div></div>
+  <button class="btn" id="installBtn" style="display:none">📲 <span data-i18n="install">Install Raksha AI on this phone</span></button>
+</div>
+
+<!-- ================= TOOLS ================= -->
+<div class="page" id="page-tools">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>🧰 <span data-i18n="m_tools">Quick Tools</span></h2></div>
+  <div class="card wide" style="margin-top:8px">
+    <div class="label" data-i18n="fakecallg">Fake Call Generator</div>
+    <div class="row2">
+      <input id="fakeCallerName" placeholder="Caller name" value="Mom">
+      <select id="fakeCallDelay"><option value="0">Now</option><option value="10">10s</option><option value="30">30s</option><option value="60">1 min</option></select>
+    </div>
+    <button class="btn amber" id="fakeCallBtn">📞 <span data-i18n="fctrigger">Trigger Fake Call</span></button>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🗣️ <span data-i18n="voiceg">Voice Guardian</span></b>
+      <p data-i18n="voicegp">Listens for your secret phrase, or "help me" / "bachao" — silently triggers the emergency workflow.</p>
+      <input id="secretPhrase" placeholder="Secret phrase" value="blue notebook">
+    </div>
+    <label class="switch"><input type="checkbox" id="voiceToggle"><span class="slider"></span></label>
+  </div>
+  <div class="banner ok-banner" id="voiceBanner"></div>
+  <div class="toggle-card">
+    <div class="t-info"><b>📳 <span data-i18n="fall">Fall & Impact Detection</span></b>
+      <p data-i18n="fallp">Accelerometer watches for violent impacts, then checks on you.</p>
+    </div>
+    <label class="switch"><input type="checkbox" id="motionToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🔊 <span data-i18n="alarm2">Loud Alarm</span></b><p data-i18n="alarmp">Siren to attract attention.</p></div>
+    <button class="btn danger" style="width:110px;margin:0" id="alarmBtn">Sound</button>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>📢 <span data-i18n="scream">Scream Detection</span></b><p data-i18n="screamp">Microphone monitors sound level on-device. A sustained scream or very loud noise triggers a check-in.</p></div>
+    <label class="switch"><input type="checkbox" id="screamToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🤳 <span data-i18n="shake">Shake to SOS</span></b><p data-i18n="shakep">Shake your phone hard 3 times in quick succession to silently trigger the emergency workflow.</p></div>
+    <label class="switch"><input type="checkbox" id="shakeToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🔦 <span data-i18n="strobe">Strobe Beacon</span></b><p data-i18n="strobep">Turns your screen into a max-brightness flashing beacon so rescuers can spot you in the dark.</p></div>
+    <button class="btn amber" style="width:110px;margin:0" onclick="startStrobe()" data-i18n="flash">Flash</button>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🎯 <span data-i18n="drill">SOS Practice Drill</span></b><p data-i18n="drillp">Rehearse the emergency flow safely so your hands know what to do when it's real. No messages are sent.</p></div>
+    <button class="btn secondary" style="width:110px;margin:0" onclick="sosDrill()" data-i18n="practice">Practice</button>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🎥 <span data-i18n="autorec">Auto Evidence Recording</span></b><p data-i18n="autorecp">When the Guardian Brain's threat level crosses 60%, the microphone starts recording automatically.</p></div>
+    <label class="switch"><input type="checkbox" id="autoRecToggle"><span class="slider"></span></label>
+  </div>
+</div>
+
+<!-- ================= WALK WITH ME ================= -->
+<div class="page" id="page-walk">
+  <div class="backbar"><button onclick="stopWalk();go('home')">←</button><h2>🚶‍♀️ <span data-i18n="walkme">Walk With Me</span></h2></div>
+  <p class="hint" data-i18n="walkhint">Keep your thumb on the button while you walk. If you release it and don't return within 3 seconds, your Guardian checks in — no answer means the emergency workflow starts. Scream detection and screen wake-lock activate automatically.</p>
+  <div class="sos-wrap" style="margin-top:20px">
+    <button id="walkBtn" style="width:200px;height:200px;border-radius:50%;border:6px solid #57e6b8;background:var(--card2);color:var(--text);font-size:17px;font-weight:800;cursor:pointer;user-select:none;-webkit-user-select:none;box-shadow:0 0 35px rgba(46,230,168,.35)">👍<br><span data-i18n="thumb">Thumb here</span></button>
+  </div>
+  <div class="card wide" style="margin-top:18px">
+    <div class="label" data-i18n="walkstat">Escort status</div>
+    <div class="value" id="walkStatus">Not active</div>
+    <div class="hint" id="walkDetail">Press and hold the button to begin.</div>
+  </div>
+  <button class="btn secondary" onclick="stopWalk()" data-i18n="endwalk">End Walk With Me</button>
+</div>
+
+<!-- ================= GUARDIAN BRAIN ================= -->
+<div class="page" id="page-brain">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>🧠 <span data-i18n="m_brain">Guardian Brain</span></h2></div>
+  <div class="card wide" style="margin-top:8px;border-color:var(--purple)">
+    <div class="label" data-i18n="threat">Unified threat level</div>
+    <div class="value" id="threatLabel" style="font-size:18px">🟢 Calm</div>
+    <div class="gauge"><div id="threatBar" style="width:4%;background:var(--green)"></div></div>
+  </div>
+  <div class="grid3">
+    <div class="card"><div class="label">Speed</div><div class="value" id="gSpeed" style="font-size:14px">—</div></div>
+    <div class="card"><div class="label">Motion</div><div class="value" id="gMotion" style="font-size:14px">—</div></div>
+    <div class="card"><div class="label">Sound</div><div class="value" id="gSound" style="font-size:14px">—</div></div>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="baseline">Your learned baseline (on-device)</div>
+    <div class="hint" id="baselineInfo" style="margin-top:6px">Learning…</div>
+  </div>
+  <h2 class="section" data-i18n="brainlog">Reasoning log — why the Guardian thinks what it thinks</h2>
+  <div id="brainLog"><p class="hint" data-i18n="nolog">No events yet. The Guardian logs every signal and decision here — full transparency, nothing hidden.</p></div>
+</div>
+
+<!-- ================= GUARDIAN ASSISTANT ================= -->
+<div class="page" id="page-assistant">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>💬 <span data-i18n="m_asst">Guardian Assistant</span></h2></div>
+  <div id="chatBox" style="min-height:220px;max-height:45vh;overflow-y:auto;background:var(--card);border:1px solid #223050;border-radius:14px;padding:12px;margin-top:8px"></div>
+  <div class="row2" style="margin-top:4px">
+    <input id="chatInput" placeholder="Describe your situation…">
+    <button class="btn" style="width:90px;margin-top:8px" onclick="chatSend()" data-i18n="send">Send</button>
+  </div>
+  <div id="chatQuick" style="margin-top:8px"></div>
+</div>
+
+<!-- ================= ICE CARD ================= -->
+<div class="page" id="page-ice">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>🆘 <span data-i18n="ice">Emergency Medical Card</span></h2></div>
+  <p class="hint" data-i18n="icehint">Works fully offline. Show this to first responders — or they can find it if they open your phone. Fill it once; it stays on this device.</p>
+  <div class="card wide" style="margin-top:8px;border-color:var(--red)">
+    <div class="label" style="color:var(--red)">IN CASE OF EMERGENCY (ICE)</div>
+    <div id="iceView" style="margin-top:8px;font-size:15px;line-height:1.9">—</div>
+  </div>
+  <h2 class="section" data-i18n="iceedit">Edit card</h2>
+  <input id="iceName" placeholder="Full name">
+  <div class="row2">
+    <select id="iceBlood"><option value="">Blood group…</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select>
+    <input id="iceDob" placeholder="Age / DOB">
+  </div>
+  <input id="iceAllergy" placeholder="Allergies (e.g., penicillin) — or 'None'">
+  <input id="iceConditions" placeholder="Medical conditions (diabetes, epilepsy…)">
+  <input id="iceMeds" placeholder="Current medications">
+  <input id="iceContact" placeholder="Emergency contact (name + phone)">
+  <button class="btn" onclick="saveIce()" data-i18n="icesave">Save card</button>
+</div>
+
+<!-- ================= SAFETY TIPS ================= -->
+<div class="page" id="page-tips">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>📖 <span data-i18n="tips">Safety Playbook</span></h2></div>
+  <div id="tipsList"></div>
+</div>
+
+<!-- ================= VAULT (SAFE SPACE) ================= -->
+<div class="page" id="page-vault">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>🔐 <span data-i18n="m_dv">Safe Space</span></h2><span style="flex:1"></span><button onclick="showDisguise()" style="border-color:var(--amber);color:var(--amber)" data-i18n="qexit">Quick Exit</button></div>
+  <p class="hint" data-i18n="vaulthint">Everything here is encrypted with your PIN (AES-256) and stored only on this device. Nothing is ever uploaded. The Quick Exit button instantly disguises the app as a calculator.</p>
+  <div class="banner warn-banner show" style="margin-top:8px" data-i18n="dvhelp">If you are in immediate danger call 112. Women Helpline: 181 · 1091. You are not alone, and this is not your fault.</div>
+  <div class="grid3">
+    <button class="btn small purple" style="width:100%;margin:10px 0 0" onclick="vaultAddNote()">📝 <span data-i18n="note">Note</span></button>
+    <button class="btn small purple" style="width:100%;margin:10px 0 0" onclick="document.getElementById('vaultPhoto').click()">📷 <span data-i18n="photo">Photo</span></button>
+    <button class="btn small purple" style="width:100%;margin:10px 0 0" id="vaultRecBtn" onclick="vaultRecord()">🎙️ <span data-i18n="voice">Voice</span></button>
+  </div>
+  <input type="file" id="vaultPhoto" accept="image/*" capture="environment" style="display:none">
+  <h2 class="section" data-i18n="timeline">Incident Timeline</h2>
+  <div id="vaultList"><p class="hint" data-i18n="vempty">Vault is empty.</p></div>
+  <button class="btn secondary" onclick="vaultExport()" data-i18n="vexport">Export timeline (for lawyer / police)</button>
+  <h2 class="section" data-i18n="dvres">Support resources</h2>
+  <div class="helpline"><div class="hl-info"><b>181</b><div data-i18n="hl181">Women Helpline — domestic abuse (24×7, all India)</div></div><a href="tel:181">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>1091</b><div data-i18n="hl1091">Women Police Helpline</div></div><a href="tel:1091">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>15100</b><div data-i18n="hl15100">NALSA — free legal aid</div></div><a href="tel:15100">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>NCW Online</b><div data-i18n="hlncw">National Commission for Women complaint portal</div></div><a href="http://www.ncwapps.nic.in/onlinecomplaintsv2/" target="_blank">🌐</a></div>
+</div>
+
+<!-- ================= SCAM SHIELD ================= -->
+<div class="page" id="page-scam">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>🕵️ <span data-i18n="m_scam">Scam Shield</span></h2></div>
+  <p class="hint" data-i18n="scamhint">Paste a suspicious SMS, WhatsApp message, email, or phone number. Analysis happens entirely on your phone — nothing is sent anywhere.</p>
+  <textarea id="scamInput" placeholder="Paste the suspicious message here…"></textarea>
+  <button class="btn" onclick="analyzeScam()" data-i18n="analyze">🔍 Analyze</button>
+  <div id="scamResult"></div>
+  <h2 class="section" data-i18n="scamres">If you've been defrauded</h2>
+  <div class="helpline"><div class="hl-info"><b>1930</b><div data-i18n="hl1930">National Cyber Crime Helpline — call within 24h to freeze fraudulent transfers</div></div><a href="tel:1930" class="red">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>cybercrime.gov.in</b><div data-i18n="hlccp">File an official cyber crime complaint online</div></div><a href="https://cybercrime.gov.in" target="_blank">🌐</a></div>
+</div>
+
+<!-- ================= ELDER ================= -->
+<div class="page" id="page-elder">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>🧓 <span data-i18n="m_elder">Elder Care</span></h2></div>
+  <div class="toggle-card">
+    <div class="t-info"><b data-i18n="eldchk">Well-being check-ins</b>
+      <p data-i18n="eldchkp">While the app is open, the Guardian asks "All good?" at your chosen interval. No answer in 60s → your circle is alerted.</p>
+      <select id="elderInterval"><option value="30">Every 30 min</option><option value="60" selected>Every 1 hour</option><option value="120">Every 2 hours</option></select>
+    </div>
+    <label class="switch"><input type="checkbox" id="elderToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b data-i18n="eldfall">Sensitive fall detection</b><p data-i18n="eldfallp">Lower threshold tuned for elders — softer falls also trigger a check-in.</p></div>
+    <label class="switch"><input type="checkbox" id="elderFallToggle"><span class="slider"></span></label>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="meds">Medicine reminder</div>
+    <div class="row2"><input id="medName" placeholder="Medicine name"><input id="medTime" type="time"></div>
+    <button class="btn small" onclick="addMed()" data-i18n="addrem">Add reminder</button>
+    <div id="medList"></div>
+    <p class="hint" data-i18n="medhint">Reminders fire as notifications while the app is open or installed.</p>
+  </div>
+  <div class="helpline"><div class="hl-info"><b>14567</b><div data-i18n="hl14567">Elder Line — national helpline for senior citizens</div></div><a href="tel:14567">📞</a></div>
+</div>
+
+<!-- ================= CHILD ================= -->
+<div class="page" id="page-child">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>🧒 <span data-i18n="m_child">Child Safety</span></h2></div>
+  <div class="card wide" style="margin-top:8px">
+    <div class="label" data-i18n="safearr">Safe arrival</div>
+    <p class="hint" data-i18n="safearrp">One tap tells your whole circle you reached safely, with your location.</p>
+    <button class="btn" onclick="safeArrival()">✅ <span data-i18n="ireached">I reached safely</span></button>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="schooltrip">School trip watch</div>
+    <p class="hint" data-i18n="schooltripp">Uses Guardian Trip Mode: set the school as destination — deviation from the usual route alerts the family.</p>
+    <button class="btn secondary" onclick="goTab('trip')" data-i18n="opentrip">Open Trip Mode</button>
+  </div>
+  <div class="helpline"><div class="hl-info"><b>1098</b><div data-i18n="hl1098">CHILDLINE — 24×7 help for children in distress</div></div><a href="tel:1098">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>112</b><div data-i18n="hl112c">Emergency (police / fire / ambulance)</div></div><a href="tel:112" class="red">📞</a></div>
+</div>
+
+<!-- ================= MIND ================= -->
+<div class="page" id="page-mind">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>💙 <span data-i18n="m_mind">Mind Guardian</span></h2></div>
+  <p class="hint" data-i18n="mindhint">If you're going through a hard time, support exists and it works. These services are free, confidential, and available in many Indian languages.</p>
+  <div class="helpline"><div class="hl-info"><b>14416</b><div data-i18n="hl14416">Tele-MANAS — Govt. of India mental health line (24×7)</div></div><a href="tel:14416">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>1800-599-0019</b><div data-i18n="hlkiran">KIRAN mental health rehabilitation helpline</div></div><a href="tel:18005990019">📞</a></div>
+  <div class="helpline"><div class="hl-info"><b>9152987821</b><div data-i18n="hlaasra">AASRA — suicide prevention (24×7)</div></div><a href="tel:9152987821">📞</a></div>
+  <div class="card wide" style="margin-top:12px">
+    <div class="label" data-i18n="ground">60-second grounding</div>
+    <div class="breath-circle" id="breathCircle" data-i18n="breathe">Breathe</div>
+    <button class="btn secondary" onclick="startBreath()" data-i18n="startg">Start breathing exercise</button>
+  </div>
+</div>
+
+<!-- ================= COMMUNITY ================= -->
+<div class="page" id="page-community">
+  <div class="backbar"><button onclick="go('modes')">←</button><h2>🗺️ <span data-i18n="m_comm">Community Shield</span></h2></div>
+  <p class="hint" data-i18n="commhint">Tap the map where something felt unsafe, choose a category, and your Guardian remembers. Reports near you lower your safety score so you stay alert. Stored on your device; share with friends to warn them.</p>
+  <div id="commMap"></div>
+  <div id="commList"></div>
+  <button class="btn secondary" onclick="shareReports()" data-i18n="commshare">Share my reports</button>
+</div>
+
+<!-- ================= HELPLINES ================= -->
+<div class="page" id="page-helplines">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>📞 <span data-i18n="m_help">India Helplines</span></h2></div>
+  <p class="hint" data-i18n="helphint">112 is India's single unified emergency number — it works in every state and UT, 24×7, even without balance. All numbers below are national government helplines.</p>
+  <div id="helplineList"></div>
+</div>
+
+<!-- ================= CIRCLE ================= -->
+<div class="page" id="page-circle">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>👥 <span data-i18n="m_circle">Trusted Circle</span></h2></div>
+  <p class="hint" data-i18n="circlehint">These people are alerted during an emergency. First contact is your primary. Stored only on your device.</p>
+  <div class="row2">
+    <input id="cName" placeholder="Name">
+    <input id="cPhone" placeholder="Phone (+91…)" type="tel">
+  </div>
+  <button class="btn" id="addContact" data-i18n="addc">Add Contact</button>
+  <div id="contactList"></div>
+  <button class="btn purple" onclick="shareLive()">📍 <span data-i18n="sharenow">Share my live location now</span></button>
+
+  <h2 class="section">🛰️ <span data-i18n="famlive">Family Live (real-time)</span></h2>
+  <p class="hint" data-i18n="famlivep">Everyone who enters the same family code sees each other on this map, live — and gets an instant alert if any member triggers SOS. Works across the world, no accounts, no cost (open-source ntfy.sh relay; use a long private code).</p>
+  <div class="row2">
+    <input id="famCode" placeholder="Family code (e.g. sharma-tigers-9481)">
+    <input id="famName" placeholder="Your name" style="max-width:110px">
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b data-i18n="famgo">Go live with my family</b><p data-i18n="famgop">Broadcasts your position every 15 s while on. Turn off any time.</p></div>
+    <label class="switch"><input type="checkbox" id="famToggle"><span class="slider"></span></label>
+  </div>
+  <div class="banner ok-banner" id="famBanner"></div>
+  <div id="famMap" style="height:230px;border-radius:14px;margin-top:10px;display:none"></div>
+  <div id="famList"></div>
+  <button class="btn secondary" onclick="shareFamCode()" data-i18n="famshare">Invite family (share code + link)</button>
+  <div class="card wide" style="margin-top:10px;text-align:center">
+    <div class="label" data-i18n="famqr">Family invite QR</div>
+    <img id="famQR" style="width:170px;height:170px;border-radius:12px;margin:10px auto 4px;display:none;background:#fff;padding:8px" alt="QR">
+    <button class="btn small secondary" onclick="showFamQR()" data-i18n="genqr">Generate QR for family to scan</button>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div class="page" id="page-dashboard">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>📊 <span data-i18n="m_dash">Safety Dashboard</span></h2></div>
+  <div class="grid">
+    <div class="card"><div class="label" data-i18n="d_trips">Trips completed safely</div><div class="value" id="dTrips">0</div></div>
+    <div class="card"><div class="label" data-i18n="d_chk">Check-ins answered</div><div class="value" id="dChecks">0</div></div>
+    <div class="card"><div class="label" data-i18n="d_scam">Messages screened</div><div class="value" id="dScams">0</div></div>
+    <div class="card"><div class="label" data-i18n="d_em">Emergency activations</div><div class="value" id="dEmergencies">0</div></div>
+    <div class="card"><div class="label" data-i18n="d_rep">Community reports</div><div class="value" id="dReports">0</div></div>
+    <div class="card"><div class="label" data-i18n="d_days">Days protected</div><div class="value" id="dDays">1</div></div>
+  </div>
+  <div class="card wide" style="margin-top:10px"><div class="label" data-i18n="d_report">Today's report</div><div class="hint" id="dailyReport" style="margin-top:6px">—</div></div>
+</div>
+
+<!-- ================= SETTINGS ================= -->
+<div class="page" id="page-settings">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>⚙️ <span data-i18n="m_set">Settings</span></h2></div>
+  <div class="toggle-card">
+    <div class="t-info"><b data-i18n="lang">Language / भाषा</b><p>English ↔ हिंदी</p></div>
+    <button class="btn small secondary" style="margin:0" onclick="toggleLang()">Switch</button>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="vpin">Safe Space PIN</div>
+    <p class="hint" data-i18n="vpinp">Protects and encrypts your evidence vault. Changing the PIN re-locks the vault (existing items stay readable with the old PIN's key until re-saved).</p>
+    <button class="btn small secondary" onclick="setupPin(true)" data-i18n="changepin">Set / change PIN</button>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🥸 <span data-i18n="stealth">Stealth launch</span></b><p data-i18n="stealthp">App always opens disguised as a calculator. Type your Safe Space PIN then "=" to unlock. Requires a PIN.</p></div>
+    <label class="switch"><input type="checkbox" id="stealthToggle"><span class="slider"></span></label>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="routines">Guardian Routines — daily check-ins</div>
+    <p class="hint" data-i18n="routinesp">e.g., "Reached home?" at 21:30 every day. Miss a check-in and your circle is alerted.</p>
+    <div class="row2"><input id="routLabel" placeholder="Check-in name (e.g. Reached home)"><input id="routTime" type="time"></div>
+    <button class="btn small" onclick="addRoutine()" data-i18n="addrout">Add routine</button>
+    <div id="routList"></div>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="zones">Safe Zones (home, office, school…)</div>
+    <p class="hint" data-i18n="zonesp">Save trusted places. Arriving at one auto-logs "reached safely" and can notify Family Live; leaving one late at night raises your alert level.</p>
+    <div class="row2"><input id="zoneName" placeholder="Zone name (e.g. Home)"><button class="btn small" style="margin-top:8px;width:130px" onclick="addZone()" data-i18n="addzone">Save here</button></div>
+    <div id="zoneList"></div>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="duress">Duress PIN (decoy vault)</div>
+    <p class="hint" data-i18n="duressp">If someone forces you to open Safe Space, enter this PIN instead — it opens an empty decoy vault. Your real evidence stays hidden.</p>
+    <button class="btn small secondary" onclick="setDuress()" data-i18n="setduress">Set duress PIN</button>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="backup">Backup & restore</div>
+    <p class="hint" data-i18n="backupp">Export settings, contacts, reports and baseline to a file (vault media stays encrypted on-device). Restore on a new phone.</p>
+    <button class="btn small secondary" onclick="backupData()" data-i18n="exportd">Export</button>
+    <button class="btn small secondary" onclick="document.getElementById('restoreFile').click()" data-i18n="importd">Restore</button>
+    <input type="file" id="restoreFile" accept=".json" style="display:none">
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="danger">Danger zone</div>
+    <button class="btn danger" onclick="wipeAll()" data-i18n="wipe">Wipe ALL app data from this device</button>
+  </div>
+  <p class="hint" style="margin-top:14px">Raksha AI · open source (MIT) · 100% on-device · no accounts · no tracking · Made for India 🇮🇳</p>
+</div>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <button class="active" data-page="home"><span class="ic">🏠</span><span data-i18n="n_home">Home</span></button>
+  <button data-page="trip"><span class="ic">🚕</span><span data-i18n="n_trip">Trip</span></button>
+  <button data-page="emergency"><span class="ic">🚨</span><span data-i18n="n_sos">SOS</span></button>
+  <button data-page="modes"><span class="ic">🛡️</span><span data-i18n="n_modes">Modes</span></button>
+  <button data-page="more"><span class="ic">☰</span><span data-i18n="n_more">More</span></button>
+</nav>
+
+<!-- ================= CHECK-IN MODAL ================= -->
+<div class="modal" id="checkinModal">
+  <div class="box">
+    <h3 id="checkinTitle">Everything okay?</h3>
+    <p class="hint" id="checkinReason">Your Guardian noticed something unusual.</p>
+    <div class="countdown" id="checkinCount">15</div>
+    <button class="btn" id="imOkBtn">✅ <span data-i18n="imok">I'm OK</span></button>
+    <button class="btn danger" id="needHelpBtn">🚨 <span data-i18n="needhelp">I need help</span></button>
+  </div>
+</div>
+
+<!-- ================= PIN MODAL ================= -->
+<div class="modal" id="pinModal">
+  <div class="box">
+    <h3 id="pinTitle">Enter PIN</h3>
+    <p class="hint" id="pinHint"></p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••" style="text-align:center;font-size:24px;letter-spacing:8px">
+    <button class="btn" id="pinOk">Unlock</button>
+    <button class="btn secondary" onclick="closePin()" data-i18n="cancel">Cancel</button>
+  </div>
+</div>
+
+<!-- ================= NOTE MODAL ================= -->
+<div class="modal" id="noteModal">
+  <div class="box">
+    <h3 data-i18n="addnote">Add incident note</h3>
+    <textarea id="noteText" placeholder="What happened, when, where, who…"></textarea>
+    <button class="btn" id="noteSave" data-i18n="saveenc">Save (encrypted)</button>
+    <button class="btn secondary" onclick="$('noteModal').classList.remove('show')" data-i18n="cancel">Cancel</button>
+  </div>
+</div>
+
+<!-- ================= FAKE CALL ================= -->
+<div id="fakeCallScreen">
+  <div class="caller">
+    <div class="avatar">👤</div>
+    <div class="name" id="fcName">Mom</div>
+    <div class="sub" id="fcSub">mobile · incoming call…</div>
+  </div>
+  <div class="actions">
+    <button class="callbtn decline" id="fcDecline">✖</button>
+    <button class="callbtn answer" id="fcAnswer">📞</button>
+  </div>
+</div>
+
+<!-- ================= DISGUISE CALCULATOR ================= -->
+<div id="disguise">
+  <div id="calcDisplay">0</div>
+  <div class="calcgrid" id="calcGrid"></div>
+</div>
+
+<!-- ================= STROBE ================= -->
+<div id="strobeOverlay" style="position:fixed;inset:0;background:#fff;z-index:4000;display:none" onclick="stopStrobe()"></div>
+
+<script src="app.js"></script>
+<script src="modes.js"></script>
+<script src="features.js"></script>
+<script src="brain.js"></script>
+<script src="guardian.js"></script>
+<script src="native-bridge.js"></script>
+</body>
+</html>

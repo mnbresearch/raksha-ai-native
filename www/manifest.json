@@ -1,0 +1,43 @@
+{
+  "name": "Raksha AI — Personal AI Safety Companion",
+  "short_name": "Raksha AI",
+  "description": "Protecting Every Journey. Every Moment. Free, open-source, on-device safety companion made for India.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "🚨 SOS — Emergency now",
+      "short_name": "SOS",
+      "url": "./?action=sos",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "🚶‍♀️ Walk With Me",
+      "short_name": "Walk",
+      "url": "./?action=walk",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "📞 Fake Call",
+      "short_name": "Fake Call",
+      "url": "./?action=fakecall",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "📍 Share my location",
+      "short_name": "Share",
+      "url": "./?action=share",
+      "icons": [{ "src": "icon.svg", "sizes": "any" }]
+    }
+  ]
+}
