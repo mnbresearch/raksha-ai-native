@@ -255,6 +255,8 @@ audio{width:100%;margin-top:8px}
   </div>
   <h2 class="section">🎙️ <span data-i18n="recent">Recent recordings</span></h2>
   <div id="recList"><p class="hint" data-i18n="norec">No recordings yet. Recordings save to your encrypted Evidence Vault.</p></div>
+  <h2 class="section">📋 <span data-i18n="incidents">Incident reports</span></h2>
+  <div id="incidentList"><p class="hint" data-i18n="noinc">After every emergency, a structured report (trigger, timeline, location, evidence) is generated here — ready for an FIR or insurance claim.</p></div>
 </div>
 
 <!-- ================= MODES HUB ================= -->
@@ -450,7 +452,11 @@ audio{width:100%;margin-top:8px}
   <div class="backbar"><button onclick="go('modes')">←</button><h2>🕵️ <span data-i18n="m_scam">Scam Shield</span></h2></div>
   <p class="hint" data-i18n="scamhint">Paste a suspicious SMS, WhatsApp message, email, or phone number. Analysis happens entirely on your phone — nothing is sent anywhere.</p>
   <textarea id="scamInput" placeholder="Paste the suspicious message here…"></textarea>
-  <button class="btn" onclick="analyzeScam()" data-i18n="analyze">🔍 Analyze</button>
+  <div class="row2">
+    <button class="btn" onclick="analyzeScam()" data-i18n="analyze" style="margin-top:8px">🔍 Analyze</button>
+    <button class="btn secondary" onclick="pasteAndAnalyze()" style="margin-top:8px;max-width:130px" data-i18n="paste">📋 Paste</button>
+  </div>
+  <p class="hint" data-i18n="sharetgt">💡 Tip: with the app installed, you can share any SMS/WhatsApp message directly to Raksha AI from the share menu — it lands here automatically.</p>
   <div id="scamResult"></div>
   <h2 class="section" data-i18n="scamres">If you've been defrauded</h2>
   <div class="helpline"><div class="hl-info"><b>1930</b><div data-i18n="hl1930">National Cyber Crime Helpline — call within 24h to freeze fraudulent transfers</div></div><a href="tel:1930" class="red">📞</a></div>
@@ -554,6 +560,16 @@ audio{width:100%;margin-top:8px}
   <div id="contactList"></div>
   <button class="btn purple" onclick="shareLive()">📍 <span data-i18n="sharenow">Share my live location now</span></button>
 
+  <h2 class="section">✈️ <span data-i18n="tg">Telegram Alerts (works even when apps are closed)</span></h2>
+  <p class="hint" data-i18n="tgp">The one gap in web alerts: family phones only hear SOS while their tracker/app is open. Telegram fixes it — real push notifications, free. Setup (5 min, once): 1) In Telegram, message @BotFather → /newbot → copy the token. 2) Add the bot to a family group → message @RawDataBot in that group to get the chat ID (looks like -100…). 3) Paste both below and Test.</p>
+  <input id="tgToken" placeholder="Bot token (123456:ABC-…)">
+  <input id="tgChat" placeholder="Chat ID (-100…)">
+  <div class="row2">
+    <button class="btn small" onclick="tgSave()" data-i18n="tgsave">Save</button>
+    <button class="btn small secondary" onclick="tgTest()" data-i18n="tgtest">Send test message</button>
+  </div>
+  <p class="hint" data-i18n="tgwarn">Stored only on this device. Anyone with the token can send as your bot — keep it private.</p>
+
   <h2 class="section">🛰️ <span data-i18n="famlive">Family Live (real-time)</span></h2>
   <p class="hint" data-i18n="famlivep">Everyone who enters the same family code sees each other on this map, live — and gets an instant alert if any member triggers SOS. Works across the world, no accounts, no cost (open-source ntfy.sh relay; use a long private code).</p>
   <div class="row2">
@@ -620,6 +636,19 @@ audio{width:100%;margin-top:8px}
   <div class="toggle-card">
     <div class="t-info"><b>📞 <span data-i18n="autocall">Auto-call primary contact on SOS</span></b><p data-i18n="autocallp">5 seconds after an emergency starts, the phone dials your first trusted contact automatically.</p></div>
     <label class="switch"><input type="checkbox" id="autoCallToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🔐 <span data-i18n="applock">App lock</span></b><p data-i18n="applockp">Require your Safe Space PIN every time the app opens.</p></div>
+    <label class="switch"><input type="checkbox" id="appLockToggle"><span class="slider"></span></label>
+  </div>
+  <div class="toggle-card">
+    <div class="t-info"><b>🔋 <span data-i18n="battsave">Battery saver</span></b><p data-i18n="battsavep">Family Live broadcasts every 60 s instead of 15 s.</p></div>
+    <label class="switch"><input type="checkbox" id="battSaveToggle"><span class="slider"></span></label>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="webhook">Advanced: SOS webhook</div>
+    <p class="hint" data-i18n="webhookp">On every emergency, Raksha POSTs JSON (event, reason, location, time) to this URL. Connect it to anything — Discord, Slack, home automation, your own server.</p>
+    <input id="webhookUrl" placeholder="https://your-endpoint.example/sos">
   </div>
   <div class="card wide" style="margin-top:10px">
     <div class="label" data-i18n="sosmsg">Custom SOS message</div>
@@ -750,6 +779,8 @@ audio{width:100%;margin-top:8px}
 <script src="extra.js"></script>
 <script src="refine.js"></script>
 <script src="v10.js"></script>
+<script src="v12.js"></script>
+<script src="robust.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>

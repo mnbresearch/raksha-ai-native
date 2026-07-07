@@ -14,6 +14,11 @@
       "purpose": "any"
     }
   ],
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": { "text": "text", "title": "title", "url": "url" }
+  },
   "shortcuts": [
     {
       "name": "🚨 SOS — Emergency now",

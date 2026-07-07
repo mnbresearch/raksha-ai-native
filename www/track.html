@@ -131,7 +131,8 @@ function render() {
     const d = document.createElement('div');
     d.className = 'member';
     d.innerHTML = '<div><b>' + (m.s === 'SOS' ? '🚨 ' : '🟣 ') + esc(m.n) + '</b><div class="sub">' +
-      (m.s === 'SOS' ? 'NEEDS HELP · ' : '') + (age < 90 ? age + 's ago' : Math.round(age / 60) + 'm ago') + '</div></div>' +
+      (m.s === 'SOS' ? 'NEEDS HELP · ' : '') + (age < 90 ? age + 's ago' : Math.round(age / 60) + 'm ago') +
+      (m.b != null ? ' · 🔋' + m.b + '%' : '') + '</div></div>' +
       (m.la != null ? '<a href="https://maps.google.com/?q=' + m.la + ',' + m.lo + '" target="_blank">directions ↗</a>' : '');
     el.appendChild(d);
   });
