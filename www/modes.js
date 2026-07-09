@@ -245,7 +245,7 @@ const SCAM_PATTERNS = [
   { re: /\botp\b|one.?time.?password/i, w: 30, tag: 'Asks about OTP — banks NEVER ask for OTP' },
   { re: /kyc.{0,30}(expir|suspend|block|update|pending)/i, w: 35, tag: 'Fake KYC expiry/update threat' },
   { re: /(electricity|power).{0,40}(disconnect|cut)/i, w: 30, tag: 'Electricity disconnection scam pattern' },
-  { re: /(digital arrest|cbi|narcotics|money launder|arrest warrant|police.{0,20}video call)/i, w: 45, tag: '"Digital arrest" scam — police NEVER arrest over video call' },
+  { re: /(digital arrest|cbi|narcotics|money launder|arrest warrant|police.{0,20}video call)/i, w: 60, tag: '"Digital arrest" scam — police NEVER arrest over video call' },
   { re: /(lottery|lucky draw|prize|winner|jackpot|kbc)/i, w: 35, tag: 'Lottery/prize fraud pattern' },
   { re: /(parcel|courier|customs|fedex|dhl).{0,40}(seized|illegal|drugs|held)/i, w: 40, tag: 'Courier/customs parcel scam' },
   { re: /(work from home|part.?time job|earn.{0,10}(daily|per day)|task.{0,20}(prepaid|commission))/i, w: 30, tag: 'Task/work-from-home fraud pattern' },
