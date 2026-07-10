@@ -724,6 +724,16 @@ audio{width:100%;margin-top:8px}
   <button data-page="more"><span class="ic">☰</span><span data-i18n="n_more">More</span></button>
 </nav>
 
+<!-- ================= LANGUAGE PICKER ================= -->
+<div class="modal" id="langModal">
+  <div class="box">
+    <h3>🌐 Language / भाषा</h3>
+    <p class="hint">Emergency features work in every language. English is used for anything not yet translated.</p>
+    <div id="langOptions" style="margin-top:10px"></div>
+    <button class="btn secondary" onclick="$('langModal').classList.remove('show')">Close</button>
+  </div>
+</div>
+
 <!-- ================= CHECK-IN MODAL ================= -->
 <div class="modal" id="checkinModal">
   <div class="box">
@@ -804,6 +814,7 @@ audio{width:100%;margin-top:8px}
 <script src="v12.js"></script>
 <script src="robust.js"></script>
 <script src="v14.js"></script>
+<script src="v15.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>

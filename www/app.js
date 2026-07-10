@@ -86,10 +86,13 @@ function applyLang() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.dataset.i18n;
     if (!(k in enCache)) enCache[k] = el.textContent;
-    el.textContent = (lang === 'hi' && I18N.hi[k]) ? I18N.hi[k] : enCache[k];
+    const dict = I18N[lang];
+    el.textContent = (dict && dict[k]) ? dict[k] : enCache[k];
   });
-  $('langBtn').textContent = lang === 'hi' ? 'English' : 'हिंदी';
+  if (window.updateLangBtn) window.updateLangBtn();
+  else $('langBtn').textContent = lang === 'hi' ? 'English' : 'हिंदी';
 }
+window.enCache = enCache;
 function toggleLang(){ lang = lang === 'hi' ? 'en' : 'hi'; store.set('lang', lang); applyLang(); }
 $('langBtn').addEventListener('click', toggleLang);
 
