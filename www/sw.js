@@ -1,9 +1,9 @@
 // Raksha AI service worker — offline app shell + offline map tiles
-const CACHE = 'raksha-v13c';
+const CACHE = 'raksha-v14';
 const TILES = 'raksha-tiles-v1';
 const TILE_CAP = 400;
 // de-duplicated; each asset cached individually so one failure can't abort install
-const ASSETS = [...new Set(['.', 'index.html', 'track.html', 'about.html', 'help.html', 'app.js', 'modes.js', 'features.js', 'brain.js', 'guardian.js', 'shield.js', 'check.js', 'extra.js', 'refine.js', 'v10.js', 'v12.js', 'robust.js', 'manifest.json', 'icon.svg',
+const ASSETS = [...new Set(['.', 'index.html', 'track.html', 'about.html', 'help.html', 'app.js', 'modes.js', 'features.js', 'brain.js', 'guardian.js', 'shield.js', 'check.js', 'extra.js', 'refine.js', 'v10.js', 'v12.js', 'robust.js', 'v14.js', 'manifest.json', 'icon.svg',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'])];
 
@@ -40,7 +40,7 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (url.includes('tile.openstreetmap.org')) { e.respondWith(tileFetch(e.request)); return; }
   // never cache live APIs
-  if (url.includes('ntfy.sh') || url.includes('overpass') || url.includes('project-osrm') || url.includes('open-meteo') || url.includes('qrserver') || url.includes('api.telegram.org')) return;
+  if (url.includes('ntfy.sh') || url.includes('overpass') || url.includes('project-osrm') || url.includes('open-meteo') || url.includes('qrserver') || url.includes('api.telegram.org') || url.includes('nominatim')) return;
   e.respondWith(
     caches.match(e.request).then(hit => hit ||
       fetch(e.request).then(res => {

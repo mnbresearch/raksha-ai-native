@@ -200,6 +200,14 @@ audio{width:100%;margin-top:8px}
     <button class="btn" style="font-size:13px" onclick="startCompanion()">🎧 <span data-i18n="companion">AI Companion Call</span></button>
     <button class="btn secondary" style="font-size:13px" onclick="escapeRoute()">🏃 <span data-i18n="escape">Nearest Safe Place</span></button>
   </div>
+  <div class="card wide" id="whereCard" style="margin-top:8px">
+    <div class="label" data-i18n="whereami">📍 Where am I?</div>
+    <div class="value" id="whereAddr" style="font-size:14px;font-weight:500;line-height:1.5">Tap to find your address</div>
+    <div class="row2">
+      <button class="btn small secondary" onclick="whereAmI()" data-i18n="findaddr">Find my address</button>
+      <button class="btn small secondary" onclick="speakAddr()" data-i18n="readaloud">🔊 Read aloud</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= TRIP ================= -->
@@ -280,6 +288,7 @@ audio{width:100%;margin-top:8px}
   <div class="mode-card" onclick="go('dashboard')"><div class="mi">📊</div><div><b data-i18n="m_dash">Safety Dashboard</b><p data-i18n="m_dashp">Your daily safety report — trips, check-ins, scams screened, alerts.</p></div></div>
   <div class="mode-card" onclick="go('tools')"><div class="mi">🧰</div><div><b data-i18n="m_tools">Quick Tools</b><p data-i18n="m_toolsp">Fake call, Voice Guardian secret phrase, fall detection, loud alarm.</p></div></div>
   <div class="mode-card" onclick="go('ice')"><div class="mi">🆘</div><div><b data-i18n="ice">Emergency Medical Card</b><p data-i18n="icep">Offline ICE card — blood group, allergies, conditions — for first responders.</p></div></div>
+  <div class="mode-card" onclick="go('firstaid')" style="border-color:var(--red)"><div class="mi">➕</div><div><b data-i18n="firstaid">First-Aid Guide</b><p data-i18n="firstaidp">Offline life-saving steps: CPR, choking, bleeding, burns, snakebite, seizure, heart attack, drowning.</p></div></div>
   <div class="mode-card" onclick="go('tips')"><div class="mi">📖</div><div><b data-i18n="tips">Safety Playbook</b><p data-i18n="tipsp">Practical safety knowledge: cabs, night walks, online safety, self-defence basics.</p></div></div>
   <div class="mode-card" onclick="go('settings')"><div class="mi">⚙️</div><div><b data-i18n="m_set">Settings</b><p data-i18n="m_setp">Language, vault PIN, wipe all data.</p></div></div>
   <button class="btn" id="installBtn" style="display:none">📲 <span data-i18n="install">Install Raksha AI on this phone</span></button>
@@ -417,6 +426,14 @@ audio{width:100%;margin-top:8px}
   <button class="btn" onclick="saveIce()" data-i18n="icesave">Save card</button>
   <button class="btn purple" onclick="iceWallpaper()" data-i18n="icewall">🖼️ Generate lock-screen wallpaper</button>
   <p class="hint" data-i18n="icewallp">Creates an image with your ICE details — set it as your lock screen so responders see it without unlocking your phone.</p>
+</div>
+
+<!-- ================= FIRST AID ================= -->
+<div class="page" id="page-firstaid">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>➕ <span data-i18n="firstaid">First-Aid Guide</span></h2></div>
+  <div class="banner warn-banner show" style="margin-top:8px" data-i18n="fahint">These are emergency first-aid basics that work offline. They do not replace a doctor — call 108 (ambulance) or 112 immediately in any medical emergency.</div>
+  <input id="faSearch" placeholder="Search (e.g. bleeding, snake, CPR)…" oninput="renderFirstAid()">
+  <div id="firstaidList"></div>
 </div>
 
 <!-- ================= SAFETY TIPS ================= -->
@@ -557,6 +574,7 @@ audio{width:100%;margin-top:8px}
   </div>
   <button class="btn" id="addContact" data-i18n="addc">Add Contact</button>
   <button class="btn secondary" onclick="importContacts()" data-i18n="importc">📇 Import from phone contacts</button>
+  <button class="btn secondary" onclick="sendTestAlert()" data-i18n="testalert">✅ Send a TEST alert to my circle</button>
   <div id="contactList"></div>
   <button class="btn purple" onclick="shareLive()">📍 <span data-i18n="sharenow">Share my live location now</span></button>
 
@@ -785,5 +803,7 @@ audio{width:100%;margin-top:8px}
 <script src="v10.js"></script>
 <script src="v12.js"></script>
 <script src="robust.js"></script>
+<script src="v14.js"></script>
+<script src="native-bridge.js"></script>
 </body>
 </html>
