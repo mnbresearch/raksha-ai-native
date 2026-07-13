@@ -164,6 +164,7 @@ audio{width:100%;margin-top:8px}
 <!-- ================= HOME ================= -->
 <div class="page active" id="page-home">
   <div class="banner ok-banner" id="briefBanner"></div>
+  <div class="banner warn-banner" id="wxAlert"></div>
   <div class="orb-wrap">
     <div class="orb" id="orb">
       <div class="status-emoji" id="orbEmoji">🛡️</div>
@@ -283,6 +284,7 @@ audio{width:100%;margin-top:8px}
 <!-- ================= MORE ================= -->
 <div class="page" id="page-more">
   <h2 class="section">☰ <span data-i18n="more">More</span></h2>
+  <div class="mode-card" onclick="go('havens')" style="border-color:var(--green)"><div class="mi">🏮</div><div><b data-i18n="m_havens">Nearby Safe Havens</b><p data-i18n="m_havensp">The closest police, hospital, 24×7 pharmacy, petrol pump, ATM and transit — lit, open places to head to, one tap to directions.</p></div></div>
   <div class="mode-card" onclick="go('helplines')"><div class="mi">📞</div><div><b data-i18n="m_help">India Helplines</b><p data-i18n="m_helpp">All-India emergency numbers — 112, women 181/1091, child 1098, cyber 1930, elder 14567, mental health 14416.</p></div></div>
   <div class="mode-card" onclick="go('circle')"><div class="mi">👥</div><div><b data-i18n="m_circle">Trusted Circle</b><p data-i18n="m_circlep">People alerted in an emergency. Share live location any time.</p></div></div>
   <div class="mode-card" onclick="go('dashboard')"><div class="mi">📊</div><div><b data-i18n="m_dash">Safety Dashboard</b><p data-i18n="m_dashp">Your daily safety report — trips, check-ins, scams screened, alerts.</p></div></div>
@@ -322,6 +324,25 @@ audio{width:100%;margin-top:8px}
   <div class="toggle-card">
     <div class="t-info"><b>🔊 <span data-i18n="alarm2">Loud Alarm</span></b><p data-i18n="alarmp">Siren to attract attention.</p></div>
     <button class="btn danger" style="width:110px;margin:0" id="alarmBtn">Sound</button>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="deter">📢 Deterrent Sounds</div>
+    <p class="hint" data-i18n="deterp">Loud, attention-grabbing sounds to scare off a threat and alert people nearby. Tap to play; tap again to stop.</p>
+    <div class="grid3">
+      <button class="btn small danger" style="width:100%;margin:6px 0 0" onclick="deter('siren')">🚨 <span data-i18n="d_siren">Police Siren</span></button>
+      <button class="btn small danger" style="width:100%;margin:6px 0 0" onclick="deter('horn')">📯 <span data-i18n="d_horn">Air Horn</span></button>
+      <button class="btn small danger" style="width:100%;margin:6px 0 0" onclick="deter('whistle')">🔔 <span data-i18n="d_whistle">Whistle</span></button>
+    </div>
+    <button class="btn small amber" style="margin-top:8px" onclick="deterVoice()">🗣️ <span data-i18n="d_voice">Fake "someone's coming" voice</span></button>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="prerec">📹 Pre-recorded SOS message</div>
+    <p class="hint" data-i18n="prerecp">Record a short message once (e.g. "This is Priya, if you got this I'm in danger, here's what to do…"). It's stored on your device and shared during an emergency.</p>
+    <div id="prerecStatus" class="hint">No message recorded yet.</div>
+    <div class="row2">
+      <button class="btn small" id="prerecBtn" onclick="prerecToggle()" data-i18n="recmsg">🎙️ Record message</button>
+      <button class="btn small secondary" onclick="prerecShare()" data-i18n="sharemsg">📤 Share now</button>
+    </div>
   </div>
   <div class="toggle-card">
     <div class="t-info"><b>📢 <span data-i18n="scream">Scream Detection</span></b><p data-i18n="screamp">Microphone monitors sound level on-device. A sustained scream or very loud noise triggers a check-in.</p></div>
@@ -555,6 +576,15 @@ audio{width:100%;margin-top:8px}
     <label class="switch"><input type="checkbox" id="volBroadcast"><span class="slider"></span></label>
   </div>
   <div class="banner warn-banner" id="volAlert"></div>
+</div>
+
+<!-- ================= SAFE HAVENS ================= -->
+<div class="page" id="page-havens">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>🏮 <span data-i18n="m_havens">Nearby Safe Havens</span></h2></div>
+  <p class="hint" data-i18n="havenshint">Lit, populated, usually-open places to head toward when you feel unsafe. Tap any card for turn-by-turn walking directions.</p>
+  <div id="havenFilters" style="display:flex;flex-wrap:wrap;gap:6px;margin:10px 0"></div>
+  <button class="btn secondary" onclick="loadHavens(true)" data-i18n="refreshhavens">🔄 Refresh from my location</button>
+  <div id="havenList"><p class="hint" data-i18n="havensload">Finding safe places near you…</p></div>
 </div>
 
 <!-- ================= HELPLINES ================= -->
@@ -816,6 +846,7 @@ audio{width:100%;margin-top:8px}
 <script src="v14.js"></script>
 <script src="v15.js"></script>
 <script src="v16.js"></script>
+<script src="v17.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>
