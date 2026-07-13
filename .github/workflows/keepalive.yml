@@ -1,0 +1,39 @@
+name: Keep-alive uptime check
+
+# Free uptime "pinger": runs every 6 hours (and can be run manually).
+# Pings the live app on both hosts. If any is down it FAILS the run,
+# and GitHub emails the repo owner automatically — so the app never
+# dies unnoticed. Static hosts (GitHub Pages, Netlify) don't sleep,
+# so this is a health monitor + warm-keep, at zero cost.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:          # manual "Run workflow" button
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping GitHub Pages (primary)
+        run: |
+          echo "Checking GitHub Pages…"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 30 https://mnbresearch.github.io/raksha-ai-native/)
+          echo "GitHub Pages HTTP $code"
+          if [ "$code" -ge 400 ] || [ "$code" -eq 000 ]; then echo "::error::GitHub Pages is DOWN ($code)"; exit 1; fi
+
+      - name: Ping Netlify (mirror)
+        continue-on-error: true   # mirror; don't fail the whole run if only this is paused
+        run: |
+          echo "Checking Netlify mirror…"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 30 https://raksha-ai-guardian.netlify.app/)
+          echo "Netlify HTTP $code"
+
+      - name: Ping live tracker
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 30 https://mnbresearch.github.io/raksha-ai-native/track.html)
+          echo "Tracker HTTP $code"
+          if [ "$code" -ge 400 ] || [ "$code" -eq 000 ]; then echo "::error::Tracker page is DOWN ($code)"; exit 1; fi
+
+      - name: All good
+        run: echo "✅ Raksha AI is up and healthy."
