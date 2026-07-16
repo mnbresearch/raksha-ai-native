@@ -653,6 +653,24 @@ audio{width:100%;margin-top:8px}
   <div class="card wide" style="margin-top:10px"><div class="label" data-i18n="d_hist">Safety score — last 24 hours</div><canvas id="scoreChart" style="width:100%;height:60px;margin-top:8px"></canvas></div>
   <div class="card wide" style="margin-top:10px"><div class="label" data-i18n="d_report">Today's report</div><div class="hint" id="dailyReport" style="margin-top:6px">—</div></div>
   <button class="btn secondary" onclick="shareWeekly()" data-i18n="sharewk">📤 Share my safety report with family</button>
+
+  <div class="card wide" style="margin-top:12px;border-color:var(--green)" id="installCard">
+    <div class="label" data-i18n="installtitle">📲 Install on your phone</div>
+    <p class="hint" data-i18n="installp2">Add Raksha AI to your home screen so it opens instantly like a native app — vital in an emergency. Works offline once installed.</p>
+    <button class="btn" onclick="doInstall()" data-i18n="installbtn2">📲 Install Raksha AI</button>
+    <button class="btn secondary" onclick="getAndroidApp()" data-i18n="getapk">🤖 Get the full Android app (APK)</button>
+    <div class="hint" id="installStatus" style="margin-top:8px"></div>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="veupd">🔄 Version &amp; updates</div>
+    <div class="hint" id="versionInfo" style="margin-top:4px">—</div>
+    <button class="btn small secondary" onclick="checkUpdate()" data-i18n="chkupd">Check for updates</button>
+    <p class="hint" data-i18n="upddesc">Updates apply automatically the next time you open the app. If one is ready while you're using it, an "Update now" banner appears so you always have the latest security fixes.</p>
+  </div>
+  <div class="card wide" style="margin-top:10px">
+    <div class="label" data-i18n="privsec">🔒 Security &amp; privacy</div>
+    <p class="hint" data-i18n="privsecp">Served over HTTPS. No accounts, no servers, no tracking. Sensitive data (evidence vault) is encrypted with AES-256 on your device. Location is shared only when you switch it on. Open source — audit it anytime.</p>
+  </div>
 </div>
 
 <!-- ================= SETTINGS ================= -->
@@ -671,6 +689,11 @@ audio{width:100%;margin-top:8px}
     <div class="label" data-i18n="syscheck">🩺 Guardian System Check</div>
     <p class="hint" data-i18n="syscheckp">Runs 20+ diagnostics: sensors, permissions, encryption, and every rescue service (family relay, routing, places, weather). Run this before relying on the app.</p>
     <button class="btn" onclick="systemCheck()" data-i18n="runcheck">Run full diagnostics</button>
+  </div>
+  <div class="card wide" style="margin-top:10px;border-color:var(--blue)">
+    <div class="label" data-i18n="permsetup">🔐 Set up permissions</div>
+    <p class="hint" data-i18n="permsetupp">Grant Location, Notifications, Microphone, Camera and Motion now — so protection works instantly in an emergency instead of asking mid-crisis.</p>
+    <button class="btn" onclick="openPermWizard()" data-i18n="permbtn">Grant permissions</button>
     <div id="sysCheckResult" style="margin-top:8px;font-size:13px;line-height:1.9"></div>
   </div>
   <div class="toggle-card">
@@ -834,6 +857,42 @@ audio{width:100%;margin-top:8px}
 </div>
 
 <script src="shield.js"></script>
+<!-- install prompt banner -->
+<div id="installBanner" style="position:fixed;left:12px;right:12px;bottom:88px;z-index:460;background:var(--card2);border:1px solid var(--green);border-radius:14px;padding:12px 14px;display:none;align-items:center;gap:10px;box-shadow:0 8px 26px rgba(0,0,0,.5)">
+  <span style="font-size:26px">📲</span>
+  <div style="flex:1;font-size:12.5px;line-height:1.4"><b>Install Raksha AI</b><br><span style="color:var(--muted)">One-tap access on your home screen — vital in an emergency.</span></div>
+  <button class="btn small" style="width:auto;margin:0" onclick="doInstall()">Install</button>
+  <button class="xbtn" style="font-size:16px" onclick="dismissInstall()">✕</button>
+</div>
+<!-- update available banner -->
+<div id="updateBanner" style="position:fixed;left:12px;right:12px;top:54px;z-index:620;background:#0f2b22;border:1px solid var(--green);color:#a8f0d5;border-radius:14px;padding:12px 14px;display:none;align-items:center;gap:10px;box-shadow:0 8px 26px rgba(0,0,0,.5)">
+  <span style="font-size:22px">🆕</span>
+  <div style="flex:1;font-size:12.5px;line-height:1.4"><b>Update available</b> — a newer, safer version is ready.</div>
+  <button class="btn small" style="width:auto;margin:0" onclick="applyUpdate()">Update now</button>
+</div>
+
+<!-- permissions wizard -->
+<div class="modal" id="permModal">
+  <div class="box" style="text-align:left">
+    <h3>🔐 <span data-i18n="permsetup">Set up your protection</span></h3>
+    <p class="hint" data-i18n="permwiz">Raksha AI needs these to protect you. Grant them now so help works instantly in an emergency — not after fumbling with prompts. Everything stays on your device.</p>
+    <div id="permList" style="margin-top:8px"></div>
+    <button class="btn" onclick="grantAllPerms()" data-i18n="grantall">✅ Grant all now</button>
+    <button class="btn secondary" onclick="document.getElementById('permModal').classList.remove('show')" data-i18n="cancel">Later</button>
+  </div>
+</div>
+
+<!-- iOS install help -->
+<div class="modal" id="iosModal">
+  <div class="box" style="text-align:left">
+    <h3>📲 Add to Home Screen</h3>
+    <p class="hint">On iPhone/iPad, install Raksha AI in 2 steps:</p>
+    <p style="font-size:14px;line-height:1.9">1. Tap the <b>Share</b> button <span style="font-size:18px">􀈂</span> at the bottom of Safari.<br>2. Scroll down and tap <b>“Add to Home Screen”</b> → <b>Add</b>.</p>
+    <p class="hint">Raksha AI will then open like a native app, full-screen and offline-ready.</p>
+    <button class="btn" onclick="document.getElementById('iosModal').classList.remove('show')" data-i18n="gotit">Got it</button>
+  </div>
+</div>
+
 <!-- floating SOS bubble -->
 <div id="sosBubble" style="position:fixed;right:14px;bottom:92px;width:58px;height:58px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;z-index:450;box-shadow:0 4px 18px rgba(255,84,112,.5);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none">SOS</div>
 
@@ -847,6 +906,7 @@ audio{width:100%;margin-top:8px}
 <script src="v15.js"></script>
 <script src="v16.js"></script>
 <script src="v17.js"></script>
+<script src="v18.js"></script>
 <script src="native-bridge.js"></script>
 </body>
 </html>

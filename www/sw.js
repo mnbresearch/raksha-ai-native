@@ -1,18 +1,24 @@
 // Raksha AI service worker — offline app shell + offline map tiles
-const CACHE = 'raksha-v17';
+const CACHE = 'raksha-v18';
 const TILES = 'raksha-tiles-v1';
 const TILE_CAP = 400;
 // de-duplicated; each asset cached individually so one failure can't abort install
-const ASSETS = [...new Set(['.', 'index.html', 'track.html', 'about.html', 'help.html', 'app.js', 'modes.js', 'features.js', 'brain.js', 'guardian.js', 'shield.js', 'check.js', 'extra.js', 'refine.js', 'v10.js', 'v12.js', 'robust.js', 'v14.js', 'v15.js', 'v16.js', 'v17.js', 'manifest.json', 'icon.svg',
+const ASSETS = [...new Set(['.', 'index.html', 'track.html', 'about.html', 'help.html', 'app.js', 'modes.js', 'features.js', 'brain.js', 'guardian.js', 'shield.js', 'check.js', 'extra.js', 'refine.js', 'v10.js', 'v12.js', 'robust.js', 'v14.js', 'v15.js', 'v16.js', 'v17.js', 'v18.js', 'manifest.json', 'icon.svg',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'])];
 
 self.addEventListener('install', e => {
+  // Do NOT auto-skipWaiting: let the new version wait so the app can
+  // show an "Update now" banner. It still applies on the next full
+  // open, so users always reach the latest security fixes.
   e.waitUntil(
     caches.open(CACHE).then(c =>
       Promise.all(ASSETS.map(a => c.add(a).catch(() => {/* tolerate individual failures */})))
-    ).then(() => self.skipWaiting())
+    )
   );
+});
+self.addEventListener('message', e => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys =>
