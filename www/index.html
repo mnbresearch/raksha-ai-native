@@ -333,6 +333,15 @@ audio{width:100%;margin-top:8px}
       <button class="btn secondary" onclick="meetExtend()" data-i18n="meetext">+30 min</button>
     </div>
   </div>
+  <div class="card wide" style="margin-top:10px;border-color:var(--blue)" id="homeCard">
+    <div class="label" data-i18n="homesafe">🏠 Home Safe</div>
+    <p class="hint" data-i18n="homesafep">Save your home once. Then one tap opens walking directions home, tells your circle you're on the way, and lets you confirm when you've arrived.</p>
+    <div id="homeSaved" class="hint" style="margin-top:4px">—</div>
+    <input id="homeLabel" placeholder="Home label (e.g., Home, Hostel, PG)" style="margin-top:6px">
+    <button class="btn small secondary" onclick="saveHomeCurrent()" data-i18n="homeset">📍 Set current location as home</button>
+    <button class="btn" onclick="headHome()" data-i18n="homego">🏠 Head home safely</button>
+    <button class="btn secondary" onclick="imHome()" data-i18n="homearr">✅ I'm home safe</button>
+  </div>
   <div class="toggle-card">
     <div class="t-info"><b>🗣️ <span data-i18n="voiceg">Voice Guardian</span></b>
       <p data-i18n="voicegp">Listens for your secret phrase, or "help me" / "bachao" — silently triggers the emergency workflow.</p>
@@ -997,5 +1006,6 @@ audio{width:100%;margin-top:8px}
 <script src="v20.js"></script>
 <script src="v21.js"></script>
 <script src="v22.js"></script>
+<script src="v23.js"></script>
 </body>
 </html>
