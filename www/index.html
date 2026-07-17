@@ -659,6 +659,7 @@ audio{width:100%;margin-top:8px}
     <p class="hint" data-i18n="installp2">Add Raksha AI to your home screen so it opens instantly like a native app — vital in an emergency. Works offline once installed.</p>
     <button class="btn" onclick="doInstall()" data-i18n="installbtn2">📲 Install Raksha AI</button>
     <button class="btn secondary" onclick="getAndroidApp()" data-i18n="getapk">🤖 Get the full Android app (APK)</button>
+    <button class="btn secondary" onclick="openAccessReq()" data-i18n="reqbtn">🙌 Request access & updates</button>
     <div class="hint" id="installStatus" style="margin-top:8px"></div>
   </div>
   <div class="card wide" style="margin-top:10px">
@@ -715,6 +716,14 @@ audio{width:100%;margin-top:8px}
   <div class="toggle-card">
     <div class="t-info"><b>🔋 <span data-i18n="battsave">Battery saver</span></b><p data-i18n="battsavep">Family Live broadcasts every 60 s instead of 15 s.</p></div>
     <label class="switch"><input type="checkbox" id="battSaveToggle"><span class="slider"></span></label>
+  </div>
+  <div class="card wide" style="margin-top:10px;border-color:var(--violet)">
+    <div class="label" data-i18n="ownercfg">👑 Owner: access-request backend</div>
+    <p class="hint" data-i18n="ownercfgp">For the app owner only. Paste your deployed Cloudflare Worker URL and the APP_SECRET you set on it. Once saved, every "Request access" form emails you automatically. Until then, requests open the user's email app addressed to you. Your Resend API key stays on the server — never here.</p>
+    <input id="reqWorkerUrl" placeholder="https://raksha-access.<your>.workers.dev" style="margin-top:6px">
+    <input id="reqAppSecret" placeholder="APP_SECRET (same string as on the worker)" style="margin-top:8px">
+    <button class="btn small" onclick="saveAccessCfg()" data-i18n="cfgsave" style="margin-top:8px">Save &amp; send test</button>
+    <div class="hint" id="reqCfgStatus" style="margin-top:6px"></div>
   </div>
   <div class="card wide" style="margin-top:10px">
     <div class="label" data-i18n="webhook">Advanced: SOS webhook</div>
@@ -893,6 +902,38 @@ audio{width:100%;margin-top:8px}
   </div>
 </div>
 
+<!-- request access / join modal -->
+<div class="modal" id="reqModal">
+  <div class="box" style="text-align:left">
+    <h3>🙌 <span data-i18n="reqtitle">Request access & updates</span></h3>
+    <p class="hint" data-i18n="reqp">Get onboarding help, early features and important safety updates. We'll email you — no spam, ever.</p>
+    <div id="reqForm">
+      <input id="reqName" placeholder="Your name" style="margin-top:6px">
+      <input id="reqEmail" type="email" placeholder="Email address *" style="margin-top:8px">
+      <input id="reqPhone" placeholder="Phone (optional)" style="margin-top:8px">
+      <input id="reqCity" placeholder="City (optional)" style="margin-top:8px">
+      <input id="reqOrg" placeholder="Organisation / NGO / school (optional)" style="margin-top:8px">
+      <select id="reqUse" style="margin-top:8px">
+        <option value="">I'm interested as… (optional)</option>
+        <option>An individual / for my family</option>
+        <option>A women's safety group / NGO</option>
+        <option>A school or college</option>
+        <option>A company (employee safety)</option>
+        <option>Police / government / partner</option>
+        <option>Media / press</option>
+      </select>
+      <button class="btn" onclick="submitAccess()" data-i18n="reqsend">Send request</button>
+      <button class="btn secondary" onclick="document.getElementById('reqModal').classList.remove('show')" data-i18n="cancel">Later</button>
+    </div>
+    <div id="reqDone" style="display:none;text-align:center;padding:6px 0">
+      <div style="font-size:40px">✅</div>
+      <p style="font-size:15px"><b data-i18n="reqthx">Thank you — request sent!</b></p>
+      <p class="hint" data-i18n="reqthx2">We'll be in touch. You can keep using Raksha AI free right now.</p>
+      <button class="btn" onclick="document.getElementById('reqModal').classList.remove('show')" data-i18n="gotit">Got it</button>
+    </div>
+  </div>
+</div>
+
 <!-- floating SOS bubble -->
 <div id="sosBubble" style="position:fixed;right:14px;bottom:92px;width:58px;height:58px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;z-index:450;box-shadow:0 4px 18px rgba(255,84,112,.5);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none">SOS</div>
 
@@ -907,6 +948,6 @@ audio{width:100%;margin-top:8px}
 <script src="v16.js"></script>
 <script src="v17.js"></script>
 <script src="v18.js"></script>
-<script src="native-bridge.js"></script>
+<script src="v19.js"></script>
 </body>
 </html>
