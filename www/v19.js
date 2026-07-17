@@ -13,9 +13,17 @@
 
 const OWNER_EMAIL = 'mnbgotyou@gmail.com';
 
+// Baked-in backend URL so EVERY user's request reaches the owner
+// automatically. Only the public worker URL ships in the app — no
+// credential. The real secret (Resend API key) lives server-side on the
+// worker and is never exposed. The owner can override from Settings, and
+// can optionally set a shared secret on their own device if they add one
+// to the worker later.
+const DEFAULT_WORKER_URL = 'https://raksha-access.mridulnanda2004.workers.dev';
+
 function accessCfg() {
   return {
-    url: store.get('reqWorkerUrl', '').trim(),
+    url: (store.get('reqWorkerUrl', '') || DEFAULT_WORKER_URL).trim(),
     secret: store.get('reqAppSecret', '').trim(),
   };
 }
@@ -94,9 +102,9 @@ function loadAccessCfg() {
   if (u) u.value = store.get('reqWorkerUrl', '');
   if (s) s.value = store.get('reqAppSecret', '');
   const st = $('reqCfgStatus');
-  if (st) st.textContent = store.get('reqWorkerUrl', '')
-    ? '✅ Backend connected — requests email you automatically.'
-    : 'Not set — requests currently open the user\'s email app to ' + OWNER_EMAIL + '.';
+  if (st) st.textContent = accessCfg().url
+    ? '✅ Backend connected — every request emails you automatically. (Leave blank to use the built-in default.)'
+    : 'Not set — requests open the user\'s email app to ' + OWNER_EMAIL + '.';
 }
 async function saveAccessCfg() {
   const url = ($('reqWorkerUrl') && $('reqWorkerUrl').value || '').trim();
