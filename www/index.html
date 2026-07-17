@@ -315,6 +315,24 @@ audio{width:100%;margin-top:8px}
     <input id="waSosNum" placeholder="WhatsApp number (with country code, optional)" style="margin-top:8px">
     <p class="hint" data-i18n="wasosnote">Leave the number blank to pick the chat yourself. Otherwise it goes straight to that contact.</p>
   </div>
+  <div class="card wide" style="margin-top:10px;border-color:var(--violet)" id="meetCard">
+    <div class="label" data-i18n="meetsafe">🤝 Meet Safe — meeting someone new</div>
+    <p class="hint" data-i18n="meetsafep">For dates, marketplace deals, rentals, or interviews. Log who you're meeting and where — Raksha checks on you and alerts your circle if you don't respond in time.</p>
+    <div id="meetSetup">
+      <input id="meetWho" placeholder="Who are you meeting? (name)">
+      <input id="meetWhere" placeholder="Where? (place / address)" style="margin-top:8px">
+      <div class="row2" style="margin-top:8px">
+        <select id="meetDur"><option value="30">30 min</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option></select>
+        <button class="btn" style="margin:0" onclick="startMeet()" data-i18n="meetstart">Start Meet Safe</button>
+      </div>
+    </div>
+    <div id="meetActive" style="display:none">
+      <div class="banner ok-banner show" id="meetStatus" style="display:block"></div>
+      <button class="btn" onclick="meetSafe()" data-i18n="meetok">✅ I'm safe — end</button>
+      <button class="btn danger" onclick="meetHelp()" data-i18n="meethelp">🚨 I need help now</button>
+      <button class="btn secondary" onclick="meetExtend()" data-i18n="meetext">+30 min</button>
+    </div>
+  </div>
   <div class="toggle-card">
     <div class="t-info"><b>🗣️ <span data-i18n="voiceg">Voice Guardian</span></b>
       <p data-i18n="voicegp">Listens for your secret phrase, or "help me" / "bachao" — silently triggers the emergency workflow.</p>
@@ -942,6 +960,18 @@ audio{width:100%;margin-top:8px}
   </div>
 </div>
 
+<!-- Meet Safe check-in overlay -->
+<div id="meetCheck" style="position:fixed;inset:0;z-index:700;background:rgba(6,10,20,.93);display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card2);border:1px solid var(--violet);border-radius:16px;max-width:340px;width:100%;padding:22px;text-align:center">
+    <div style="font-size:44px">⏰</div>
+    <h3 style="margin:6px 0" data-i18n="meetq">Are you safe?</h3>
+    <p class="hint" id="meetCheckMsg">Your Meet Safe time is up. Tap within 5 minutes or we'll alert your circle.</p>
+    <button class="btn" onclick="meetSafe()">✅ <span data-i18n="meetimok">I'm safe</span></button>
+    <button class="btn danger" onclick="meetHelp()">🚨 <span data-i18n="meetsendhelp">Send help now</span></button>
+    <button class="btn secondary" onclick="meetExtend()" data-i18n="meetext30">+30 min, I'm fine</button>
+  </div>
+</div>
+
 <!-- floating SOS bubble -->
 <div id="sosBubble" style="position:fixed;right:14px;bottom:92px;width:58px;height:58px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;z-index:450;box-shadow:0 4px 18px rgba(255,84,112,.5);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none">SOS</div>
 
@@ -958,5 +988,6 @@ audio{width:100%;margin-top:8px}
 <script src="v18.js"></script>
 <script src="v19.js"></script>
 <script src="v20.js"></script>
+<script src="v21.js"></script>
 </body>
 </html>
