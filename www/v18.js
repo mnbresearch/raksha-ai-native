@@ -9,7 +9,7 @@
    ========================================================= */
 "use strict";
 
-const APP_VERSION = 'v19';
+const APP_VERSION = 'v20';
 try { store.set('appversion', APP_VERSION); } catch (e) {}
 
 /* ---------- install detection ---------- */

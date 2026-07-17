@@ -307,6 +307,14 @@ audio{width:100%;margin-top:8px}
     </div>
     <button class="btn amber" id="fakeCallBtn">📞 <span data-i18n="fctrigger">Trigger Fake Call</span></button>
   </div>
+  <div class="card wide" style="margin-top:10px;border-color:#25D366">
+    <div class="label" data-i18n="wasos">💬 WhatsApp SOS</div>
+    <p class="hint" data-i18n="wasosp">One tap opens WhatsApp with an emergency message and your live location map link — ready to send to your trusted contact. Works when a call feels unsafe.</p>
+    <button class="btn" style="background:#25D366;color:#04310f" onclick="waShareSOS()">💬 <span data-i18n="wasosbtn">Send WhatsApp SOS</span></button>
+    <button class="btn secondary" onclick="waReached()">✅ <span data-i18n="wareach">"Reached safely" on WhatsApp</span></button>
+    <input id="waSosNum" placeholder="WhatsApp number (with country code, optional)" style="margin-top:8px">
+    <p class="hint" data-i18n="wasosnote">Leave the number blank to pick the chat yourself. Otherwise it goes straight to that contact.</p>
+  </div>
   <div class="toggle-card">
     <div class="t-info"><b>🗣️ <span data-i18n="voiceg">Voice Guardian</span></b>
       <p data-i18n="voicegp">Listens for your secret phrase, or "help me" / "bachao" — silently triggers the emergency workflow.</p>
@@ -949,5 +957,6 @@ audio{width:100%;margin-top:8px}
 <script src="v17.js"></script>
 <script src="v18.js"></script>
 <script src="v19.js"></script>
+<script src="v20.js"></script>
 </body>
 </html>
