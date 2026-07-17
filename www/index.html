@@ -473,6 +473,13 @@ audio{width:100%;margin-top:8px}
   <button class="btn" onclick="saveIce()" data-i18n="icesave">Save card</button>
   <button class="btn purple" onclick="iceWallpaper()" data-i18n="icewall">🖼️ Generate lock-screen wallpaper</button>
   <p class="hint" data-i18n="icewallp">Creates an image with your ICE details — set it as your lock screen so responders see it without unlocking your phone.</p>
+  <button class="btn" style="background:#0b7285" onclick="iceQR()" data-i18n="iceqr">🔳 Show emergency QR code</button>
+  <p class="hint" data-i18n="iceqrp">Any responder can scan this with a plain phone camera — no app needed — to instantly read your blood group, allergies, conditions, medications and emergency contact. Print it for your wallet, bag or helmet.</p>
+  <div id="iceQrBox" style="display:none;text-align:center;margin-top:10px">
+    <img id="iceQrImg" alt="Emergency medical QR" style="width:230px;height:230px;background:#fff;border-radius:12px;padding:8px">
+    <div class="hint" id="iceQrCap" style="margin-top:6px"></div>
+    <button class="btn small secondary" onclick="iceQrDownload()" data-i18n="iceqrdl" style="margin-top:8px">⬇️ Download QR</button>
+  </div>
 </div>
 
 <!-- ================= FIRST AID ================= -->
@@ -989,5 +996,6 @@ audio{width:100%;margin-top:8px}
 <script src="v19.js"></script>
 <script src="v20.js"></script>
 <script src="v21.js"></script>
+<script src="v22.js"></script>
 </body>
 </html>
