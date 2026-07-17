@@ -1,5 +1,5 @@
 // Raksha AI service worker — offline app shell + offline map tiles
-const CACHE = 'raksha-v22';
+const CACHE = 'raksha-v22b';
 const TILES = 'raksha-tiles-v1';
 const TILE_CAP = 400;
 // de-duplicated; each asset cached individually so one failure can't abort install

@@ -86,6 +86,13 @@ function showMeetCheck(msg) {
 }
 function hideMeetCheck() { const el = $('meetCheck'); if (el) el.style.display = 'none'; }
 
+/* escape user-entered strings before putting them in innerHTML */
+function meetEsc(s) {
+  if (typeof esc === 'function') return esc(s);
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
 function meetRender() {
   const m = meetGet();
   const setup = $('meetSetup'), active = $('meetActive'), status = $('meetStatus');
@@ -94,8 +101,10 @@ function meetRender() {
   setup.style.display = 'none'; active.style.display = '';
   if (status) {
     const left = m.endAt - Date.now();
+    const who = meetEsc(m.who || 'someone');
+    const where = m.where ? ' at ' + meetEsc(m.where) : '';
     const line = left > 0
-      ? '🤝 Meeting ' + (m.who || 'someone') + (m.where ? ' at ' + m.where : '') + ' — check-in in <b>' + fmtLeft(left) + '</b>'
+      ? '🤝 Meeting ' + who + where + ' — check-in in <b>' + fmtLeft(left) + '</b>'
       : (m.escalated ? '🚨 No response — your circle was alerted. Tap "I\'m safe" to stand down.'
         : '⏰ Time\'s up — please confirm you\'re safe.');
     status.innerHTML = line;
