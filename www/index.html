@@ -162,9 +162,44 @@ audio{width:100%;margin-top:8px}
 </header>
 
 <!-- ================= HOME ================= -->
+<style>
+  .qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:2px 0 12px}
+  .qa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:14px 6px;border-radius:16px;border:1px solid var(--line);background:var(--card2);color:var(--text);cursor:pointer;font-size:11.5px;font-weight:700;line-height:1.2;text-align:center;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+  .qa span{font-size:25px;line-height:1}
+  .qa:active{transform:scale(.94)}
+  .qa.red{border-color:var(--red);box-shadow:0 4px 16px rgba(255,84,112,.18)}
+  .qa.green{border-color:var(--green)}
+  .qa.blue{border-color:var(--blue)}
+  .qa.amber{border-color:#f5a623}
+  .qa.purple{border-color:var(--purple)}
+  #helpStrip{margin-bottom:10px;border:1px solid var(--blue);border-radius:16px;padding:14px;background:linear-gradient(135deg,rgba(91,157,255,.14),rgba(46,230,168,.06))}
+  #helpStrip .hs-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .qa-title{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:2px 0 6px}
+</style>
 <div class="page active" id="page-home">
+  <div id="helpStrip">
+    <div class="hs-row">
+      <b style="font-size:15px">👋 <span data-i18n="welcome">Welcome — you're protected</span></b>
+      <button class="xbtn" style="font-size:16px" onclick="dismissHelp()">✕</button>
+    </div>
+    <p class="hint" style="margin:6px 0" data-i18n="welcomep">Be ready in 3 quick steps. Tap Help anytime for a simple guide.</p>
+    <div class="grid3">
+      <button class="btn small" style="margin:0" onclick="go('circle')" data-i18n="wsAdd">① Add contacts</button>
+      <button class="btn small secondary" style="margin:0" onclick="openPermWizard()" data-i18n="wsPerm">② Permissions</button>
+      <button class="btn small secondary" style="margin:0" onclick="openHelp()" data-i18n="wsHelp">❓ Help</button>
+    </div>
+  </div>
   <div class="banner ok-banner" id="briefBanner"></div>
   <div class="banner warn-banner" id="wxAlert"></div>
+  <div class="qa-title" data-i18n="qatitle">Quick actions</div>
+  <div class="qa-grid">
+    <button class="qa red" onclick="go('emergency')"><span>🚨</span><b data-i18n="qaSos">SOS</b></button>
+    <button class="qa green" onclick="waShareSOS()"><span>💬</span><b data-i18n="qaWa">WhatsApp SOS</b></button>
+    <button class="qa" onclick="go('walk')"><span>🚶‍♀️</span><b data-i18n="qaWalk">Walk with me</b></button>
+    <button class="qa amber" onclick="showFakeCall()"><span>📞</span><b data-i18n="qaFake">Fake call</b></button>
+    <button class="qa blue" onclick="shareLive()"><span>📍</span><b data-i18n="qaShare">Share live</b></button>
+    <button class="qa purple" onclick="go('helplines')"><span>🆘</span><b data-i18n="qaHelp">Helplines</b></button>
+  </div>
   <div class="orb-wrap">
     <div class="orb" id="orb">
       <div class="status-emoji" id="orbEmoji">🛡️</div>
@@ -976,6 +1011,19 @@ audio{width:100%;margin-top:8px}
   </div>
 </div>
 
+<!-- Help overlay -->
+<div class="modal" id="helpModal">
+  <div class="box" style="text-align:left;max-height:82vh;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">❓ <span data-i18n="helptitle">How to use Raksha AI</span></h3>
+      <button class="xbtn" style="font-size:18px" onclick="closeHelp()">✕</button>
+    </div>
+    <p class="hint" data-i18n="helpintro">Everything works on your phone — no account, no internet needed for the essentials. Here's the quick version:</p>
+    <div id="helpBody" style="font-size:14px;line-height:1.7"></div>
+    <button class="btn" onclick="closeHelp()" data-i18n="gotit">Got it</button>
+  </div>
+</div>
+
 <!-- Meet Safe check-in overlay -->
 <div id="meetCheck" style="position:fixed;inset:0;z-index:700;background:rgba(6,10,20,.93);display:none;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card2);border:1px solid var(--violet);border-radius:16px;max-width:340px;width:100%;padding:22px;text-align:center">
@@ -1007,5 +1055,6 @@ audio{width:100%;margin-top:8px}
 <script src="v21.js"></script>
 <script src="v22.js"></script>
 <script src="v23.js"></script>
+<script src="v24.js"></script>
 </body>
 </html>

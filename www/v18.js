@@ -9,7 +9,7 @@
    ========================================================= */
 "use strict";
 
-const APP_VERSION = 'v23';
+const APP_VERSION = 'v24';
 try { store.set('appversion', APP_VERSION); } catch (e) {}
 
 /* ---------- install detection ---------- */
