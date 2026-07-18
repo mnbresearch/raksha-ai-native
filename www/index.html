@@ -191,6 +191,7 @@ audio{width:100%;margin-top:8px}
   </div>
   <div class="banner ok-banner" id="briefBanner"></div>
   <div class="banner warn-banner" id="wxAlert"></div>
+  <input id="findBar" placeholder="🔍 Search all features (scam, vault, home…)" onfocus="openFind()" readonly style="margin:2px 0 10px;cursor:pointer">
   <div class="qa-title" data-i18n="qatitle">Quick actions</div>
   <div class="qa-grid">
     <button class="qa red" onclick="go('emergency')"><span>🚨</span><b data-i18n="qaSos">SOS</b></button>
@@ -319,6 +320,7 @@ audio{width:100%;margin-top:8px}
 <!-- ================= MORE ================= -->
 <div class="page" id="page-more">
   <h2 class="section">☰ <span data-i18n="more">More</span></h2>
+  <button class="btn" onclick="openFind()" style="margin-bottom:10px" data-i18n="findbtn">🔍 Find any feature</button>
   <div class="mode-card" onclick="go('havens')" style="border-color:var(--green)"><div class="mi">🏮</div><div><b data-i18n="m_havens">Nearby Safe Havens</b><p data-i18n="m_havensp">The closest police, hospital, 24×7 pharmacy, petrol pump, ATM and transit — lit, open places to head to, one tap to directions.</p></div></div>
   <div class="mode-card" onclick="go('helplines')"><div class="mi">📞</div><div><b data-i18n="m_help">India Helplines</b><p data-i18n="m_helpp">All-India emergency numbers — 112, women 181/1091, child 1098, cyber 1930, elder 14567, mental health 14416.</p></div></div>
   <div class="mode-card" onclick="go('circle')"><div class="mi">👥</div><div><b data-i18n="m_circle">Trusted Circle</b><p data-i18n="m_circlep">People alerted in an emergency. Share live location any time.</p></div></div>
@@ -1011,6 +1013,17 @@ audio{width:100%;margin-top:8px}
   </div>
 </div>
 
+<!-- Feature finder overlay -->
+<div class="modal" id="findModal">
+  <div class="box" style="text-align:left;max-height:82vh;overflow:auto">
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="findQ" placeholder="Type: scam, vault, fake call, home…" oninput="renderFind()" style="flex:1;margin:0">
+      <button class="xbtn" style="font-size:18px" onclick="closeFind()">✕</button>
+    </div>
+    <div id="findResults" style="margin-top:10px"></div>
+  </div>
+</div>
+
 <!-- Help overlay -->
 <div class="modal" id="helpModal">
   <div class="box" style="text-align:left;max-height:82vh;overflow:auto">
@@ -1056,5 +1069,6 @@ audio{width:100%;margin-top:8px}
 <script src="v22.js"></script>
 <script src="v23.js"></script>
 <script src="v24.js"></script>
+<script src="v25.js"></script>
 </body>
 </html>
