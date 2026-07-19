@@ -327,6 +327,7 @@ audio{width:100%;margin-top:8px}
   <div class="mode-card" onclick="go('dashboard')"><div class="mi">📊</div><div><b data-i18n="m_dash">Safety Dashboard</b><p data-i18n="m_dashp">Your daily safety report — trips, check-ins, scams screened, alerts.</p></div></div>
   <div class="mode-card" onclick="go('tools')"><div class="mi">🧰</div><div><b data-i18n="m_tools">Quick Tools</b><p data-i18n="m_toolsp">Fake call, Voice Guardian secret phrase, fall detection, loud alarm.</p></div></div>
   <div class="mode-card" onclick="go('ice')"><div class="mi">🆘</div><div><b data-i18n="ice">Emergency Medical Card</b><p data-i18n="icep">Offline ICE card — blood group, allergies, conditions — for first responders.</p></div></div>
+  <div class="mode-card" onclick="go('chain')" style="border-color:var(--purple)"><div class="mi">⛓️</div><div><b data-i18n="chain">Evidence Chain</b><p data-i18n="chainp">Tamper-evident incident log. Each entry is cryptographically sealed to the last, so edits or back-dating are detectable — court-credible proof, built on your phone.</p></div></div>
   <div class="mode-card" onclick="go('firstaid')" style="border-color:var(--red)"><div class="mi">➕</div><div><b data-i18n="firstaid">First-Aid Guide</b><p data-i18n="firstaidp">Offline life-saving steps: CPR, choking, bleeding, burns, snakebite, seizure, heart attack, drowning.</p></div></div>
   <div class="mode-card" onclick="go('tips')"><div class="mi">📖</div><div><b data-i18n="tips">Safety Playbook</b><p data-i18n="tipsp">Practical safety knowledge: cabs, night walks, online safety, self-defence basics.</p></div></div>
   <div class="mode-card" onclick="go('settings')"><div class="mi">⚙️</div><div><b data-i18n="m_set">Settings</b><p data-i18n="m_setp">Language, vault PIN, wipe all data.</p></div></div>
@@ -526,6 +527,33 @@ audio{width:100%;margin-top:8px}
     <div class="hint" id="iceQrCap" style="margin-top:6px"></div>
     <button class="btn small secondary" onclick="iceQrDownload()" data-i18n="iceqrdl" style="margin-top:8px">⬇️ Download QR</button>
   </div>
+</div>
+
+<!-- ================= EVIDENCE CHAIN ================= -->
+<div class="page" id="page-chain">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>⛓️ <span data-i18n="chain">Evidence Chain</span></h2></div>
+  <div class="banner ok-banner show" style="display:block" data-i18n="chainintro">Tamper-evident record. Every entry is cryptographically sealed to the one before it, so if anything is edited, deleted or back-dated later, verification fails. That's what makes a log credible to police, lawyers and courts.</div>
+  <div class="card wide" style="margin-top:8px;border-color:var(--purple)">
+    <div class="label" data-i18n="chainadd">Add an entry</div>
+    <textarea id="chainNote" rows="3" placeholder="What happened? Be factual — who, what, where, any witnesses." style="width:100%"></textarea>
+    <select id="chainType" style="margin-top:8px">
+      <option value="Incident">Incident</option>
+      <option value="Threat / message">Threat / message</option>
+      <option value="Injury">Injury</option>
+      <option value="Witness">Witness</option>
+      <option value="Property damage">Property damage</option>
+      <option value="Financial">Financial control / theft</option>
+      <option value="Other">Other</option>
+    </select>
+    <label class="hint" style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="chainLoc" checked> <span data-i18n="chainloc">Attach my current location</span></label>
+    <button class="btn" onclick="chainAdd()" data-i18n="chainseal">🔒 Seal entry into chain</button>
+  </div>
+  <div class="row2" style="margin-top:8px">
+    <button class="btn secondary" style="margin:0" onclick="chainVerify()" data-i18n="chainverify">🔍 Verify chain</button>
+    <button class="btn secondary" style="margin:0" onclick="chainExport()" data-i18n="chainexport">⬇️ Export proof</button>
+  </div>
+  <div id="chainStatus" class="hint" style="margin-top:8px"></div>
+  <div id="chainList" style="margin-top:8px"></div>
 </div>
 
 <!-- ================= FIRST AID ================= -->
@@ -1070,5 +1098,6 @@ audio{width:100%;margin-top:8px}
 <script src="v23.js"></script>
 <script src="v24.js"></script>
 <script src="v25.js"></script>
+<script src="v26.js"></script>
 </body>
 </html>
