@@ -328,6 +328,7 @@ audio{width:100%;margin-top:8px}
   <div class="mode-card" onclick="go('tools')"><div class="mi">🧰</div><div><b data-i18n="m_tools">Quick Tools</b><p data-i18n="m_toolsp">Fake call, Voice Guardian secret phrase, fall detection, loud alarm.</p></div></div>
   <div class="mode-card" onclick="go('ice')"><div class="mi">🆘</div><div><b data-i18n="ice">Emergency Medical Card</b><p data-i18n="icep">Offline ICE card — blood group, allergies, conditions — for first responders.</p></div></div>
   <div class="mode-card" onclick="go('chain')" style="border-color:var(--purple)"><div class="mi">⛓️</div><div><b data-i18n="chain">Evidence Chain</b><p data-i18n="chainp">Tamper-evident incident log. Each entry is cryptographically sealed to the last, so edits or back-dating are detectable — court-credible proof, built on your phone.</p></div></div>
+  <div class="mode-card" onclick="go('complaint')" style="border-color:var(--blue)"><div class="mi">📝</div><div><b data-i18n="comp">Complaint &amp; FIR Helper</b><p data-i18n="compp">Turn an incident into a ready-to-file police FIR, cyber-crime (1930) or women's-cell complaint — correctly worded for India, with your Evidence Chain attached.</p></div></div>
   <div class="mode-card" onclick="go('firstaid')" style="border-color:var(--red)"><div class="mi">➕</div><div><b data-i18n="firstaid">First-Aid Guide</b><p data-i18n="firstaidp">Offline life-saving steps: CPR, choking, bleeding, burns, snakebite, seizure, heart attack, drowning.</p></div></div>
   <div class="mode-card" onclick="go('tips')"><div class="mi">📖</div><div><b data-i18n="tips">Safety Playbook</b><p data-i18n="tipsp">Practical safety knowledge: cabs, night walks, online safety, self-defence basics.</p></div></div>
   <div class="mode-card" onclick="go('settings')"><div class="mi">⚙️</div><div><b data-i18n="m_set">Settings</b><p data-i18n="m_setp">Language, vault PIN, wipe all data.</p></div></div>
@@ -554,6 +555,39 @@ audio{width:100%;margin-top:8px}
   </div>
   <div id="chainStatus" class="hint" style="margin-top:8px"></div>
   <div id="chainList" style="margin-top:8px"></div>
+</div>
+
+<!-- ================= COMPLAINT / FIR HELPER ================= -->
+<div class="page" id="page-complaint">
+  <div class="backbar"><button onclick="go('more')">←</button><h2>📝 <span data-i18n="comp">Complaint &amp; FIR Helper</span></h2></div>
+  <div class="banner ok-banner show" style="display:block" data-i18n="compintro">Turn what happened into a properly formatted complaint you can print and file — police FIR, cyber-crime (1930), or women's-cell. It fills in the right authorities and wording for India. This is a self-help draft, not legal advice.</div>
+  <div class="card wide" style="margin-top:8px;border-color:var(--blue)">
+    <div class="label" data-i18n="comptype">Type of complaint</div>
+    <select id="compType" onchange="compHint()">
+      <option value="fir">Police FIR / General complaint</option>
+      <option value="cyber">Cyber-crime (fraud, online abuse) — 1930</option>
+      <option value="women">Women's cell / harassment</option>
+      <option value="domestic">Domestic incident (Protection of Women Act)</option>
+      <option value="other">Other / General</option>
+    </select>
+    <div class="hint" id="compHint" style="margin-top:6px"></div>
+    <input id="compName" placeholder="Your full name" style="margin-top:8px">
+    <input id="compAddr" placeholder="Your address">
+    <input id="compPhone" placeholder="Your phone">
+    <div class="row2"><input id="compWhen" placeholder="Date & time of incident"><input id="compWhere" placeholder="Place of incident"></div>
+    <input id="compWho" placeholder="Accused / other party (name or 'unknown')">
+    <textarea id="compWhat" rows="4" placeholder="Describe exactly what happened — facts, in order. Who did what, any witnesses, any injury or loss." style="width:100%;margin-top:8px"></textarea>
+    <label class="hint" style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="compChain" checked> <span data-i18n="compchain">Attach my Evidence Chain summary (tamper-proof record)</span></label>
+    <button class="btn" onclick="compGen()" data-i18n="compgen">📝 Generate complaint draft</button>
+  </div>
+  <div id="compOutWrap" style="display:none;margin-top:10px">
+    <div class="card wide"><pre id="compOut" style="white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.6;margin:0;font-family:inherit"></pre></div>
+    <div class="grid3" style="margin-top:8px">
+      <button class="btn small" onclick="compCopy()" data-i18n="compcopy">📋 Copy</button>
+      <button class="btn small secondary" onclick="compDownload()" data-i18n="compdl">⬇️ Download</button>
+      <button class="btn small secondary" onclick="compPrint()" data-i18n="compprint">🖨️ Print</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= FIRST AID ================= -->
@@ -1099,5 +1133,6 @@ audio{width:100%;margin-top:8px}
 <script src="v24.js"></script>
 <script src="v25.js"></script>
 <script src="v26.js"></script>
+<script src="v27.js"></script>
 </body>
 </html>
